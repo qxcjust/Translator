@@ -1,0 +1,8 @@
+pandas
+python-pptx
+openpyxl
+docx  
+celery
+flask
+click
+pyamqp
