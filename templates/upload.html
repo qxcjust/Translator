@@ -42,11 +42,11 @@
                             <td>上传进度:</td>
                         </tr>
                         <tr>
-                            <td id="file-name"></td>
-                            <td id="file-type"></td>
-                            <td id="file-pages"></td>
-                            <td id="file-size"></td>
-                            <td id="upload-progress"></td>
+                            <td id="file-name"> </td>
+                            <td id="file-type"> </td>
+                            <td id="file-pages"> </td>
+                            <td id="file-size"> </td>
+                            <td id="upload-progress"> </td>
                         </tr>
                     </table>
                 </div>
@@ -113,7 +113,7 @@
                     onprogress: function(event) {
                         if (event.lengthComputable) {
                             const percentComplete = Math.round((event.loaded / event.total) * 100);
-                            document.getElementById('upload-progress').textContent = `上传进度: ${percentComplete}%`;
+                            document.getElementById('upload-progress').textContent = `${percentComplete}%`;
                         }
                     }
                 })
@@ -126,11 +126,11 @@
                     return response.json();
                 })
                 .then(data => {
-                    alert(data.message);
-                    const file = files[0];
-                    document.getElementById('file-name').textContent = `文件名: ${file.name}`;
-                    document.getElementById('file-type').textContent = `文件类型: ${file.type}`;
-                    document.getElementById('file-size').textContent = `文件大小: ${(file.size / 1024).toFixed(2)} KB`;
+                    //alert(data.message);
+                    // const file = files[0];
+                    document.getElementById('file-name').textContent = `${data.file_name}`;
+                    document.getElementById('file-type').textContent = `${data.file_type}`;
+                    document.getElementById('file-size').textContent = `${(data.file_size / 1024).toFixed(2)} KB`;
                 })
                 .catch(error => {
                     console.error('Error:', error);

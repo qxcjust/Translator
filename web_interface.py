@@ -46,7 +46,36 @@ def upload_file():
         
         file_path = os.path.join(date_folder, file.filename)
         file.save(file_path)
-        return jsonify({"message": "File successfully uploaded", "file_path": file_path}), 200
+        
+        # 获取文件大小
+        file_size = os.path.getsize(file_path)
+        
+        # 获取文件MIME类型
+        file_mime_type = file.content_type
+        
+        # 定义MIME类型到缩写形式的映射
+        mime_to_extension = {
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+            'application/vnd.ms-powerpoint': 'PPT',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PPTX',
+            'application/vnd.ms-excel': 'XLS',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX'
+        }
+        
+        # 转换MIME类型到缩写形式
+        file_type = mime_to_extension.get(file_mime_type, file_extension)
+        
+        # 假设文件页数的计算逻辑后续实现
+        file_pages = 0  # 这里暂时设置为0
+        
+        return jsonify({
+            "message": "File successfully uploaded",
+            "file_path": file_path,
+            "file_name": file.filename,
+            "file_type": file_type,
+            "file_size": file_size,
+            "file_pages": file_pages
+        }), 200
 
 if __name__ == "__main__":
     app.run(debug=True)
