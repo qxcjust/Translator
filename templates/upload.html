@@ -54,12 +54,14 @@
                     <div id="language-selector">
                         <label for="source-lang">源语言:</label>
                         <select id="source-lang" style="width: 150px; height: 30px; margin-right: 10px;">
+                            <option value="undefined">请选择源语言</option> <!-- 添加空选项 -->
                             <option value="zh">中文</option>
                             <option value="en">英文</option>
                             <option value="ja">日文</option>
                         </select>
                         <label for="target-lang">目标语言:</label>
                         <select id="target-lang" style="width: 150px; height: 30px;">
+                            <option value="undefined">请选择目标语言</option> <!-- 添加空选项 -->
                             <option value="zh">中文</option>
                             <option value="en">英文</option>
                             <option value="ja">日文</option>
@@ -172,7 +174,6 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                showErrorMessage();
             });
         });
     </script>
