@@ -50,6 +50,11 @@ def upload_file():
         
         # 获取文件大小
         file_size = os.path.getsize(file_path)
+        # 格式化文件大小，文件大小过大的话，则用MB表示
+        if file_size > 1024 * 1024:
+            file_size = f"{file_size / (1024 * 1024):.2f} MB"
+        else:
+            file_size = f"{file_size / 1024:.2f} KB"
         
         # 获取文件MIME类型
         file_mime_type = file.content_type
