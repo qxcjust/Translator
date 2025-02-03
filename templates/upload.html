@@ -17,7 +17,7 @@
                 <img src="{{ url_for('static', filename='images/icon-pdf.png') }}" alt="PDF Icon">
             </div>
             <p class="supported-formats" style="color: rgb(55, 69, 103);">
-                点击或拖动文件上传（可批量上传）
+                点击或拖动文件上传
             </p>
             <button id="selectFileBtn">选择文档</button>
             <!-- 添加隐藏的文件输入元素 -->
@@ -28,10 +28,6 @@
                 <span>文件格式不支持！支持的格式为：.docx, .ppt, .pptx, .xls, .xlsx</span>
             </div>
 
-        </div>
-        <!-- 添加进度条 -->
-        <div id="progress-bar">
-            <div id="progress"></div>
         </div>
         <!-- 添加语言选择下拉框 -->
         <div id="language-selector">
