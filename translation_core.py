@@ -3,9 +3,9 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema import StrOutputParser
 
 class TranslationCore:
-    def __init__(self, api_key, model_name="deepseek-v2:16b", base_url="http://192.168.146.137:11434/v1", temperature=0):
+    def __init__(self, model_name="deepseek-v2:16b", base_url="http://192.168.146.137:11434/v1", temperature=0):
         # 初始化模型
-        self.llm = ChatOpenAI(model=model_name, base_url=base_url, api_key=api_key, temperature=temperature)
+        self.llm = ChatOpenAI(model=model_name, base_url=base_url, temperature=temperature)
         
         
         self.prompt = ChatPromptTemplate.from_template(
@@ -64,5 +64,5 @@ class TranslationCore:
 
     def translate_text(self, text, source_lang, target_lang):
         # 使用聊天链进行翻译
-        response = self.chain.invoke({"input": text, "lg_to": target_lang})
+        response = self.chain.invoke({"input": text, "lg_from":source_lang, "lg_to": target_lang})
         return response

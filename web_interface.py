@@ -3,6 +3,7 @@ from task_manager import translate_file
 import os
 from datetime import datetime
 from pptx import Presentation
+from celery import Celery
 
 app = Flask(__name__)
 
@@ -10,6 +11,14 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'Updatefile'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Celery配置
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+# 初始化Celery
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 @app.route('/')
 def home():

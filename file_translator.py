@@ -3,8 +3,8 @@ from format_preserver import save_translated_excel, save_translated_powerpoint, 
 from translation_core import TranslationCore
 
 class FileTranslator:
-    def __init__(self, ollama_api_key, model_address):
-        self.translation_core = TranslationCore(api_key=ollama_api_key, model_address=model_address)
+    def __init__(self, model_address):
+        self.translation_core = TranslationCore(model_address=model_address)
 
     def translate_excel(self, file_path, output_path, source_lang, target_lang):
         df = parse_excel(file_path)
