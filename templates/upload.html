@@ -29,20 +29,45 @@
             </div>
 
         </div>
-        <!-- 添加语言选择下拉框 -->
-        <div id="language-selector">
-            <label for="source-lang">源语言:</label>
-            <select id="source-lang" style="width: 150px; height: 30px; margin-right: 10px;">
-                <option value="zh">中文</option>
-                <option value="en">英文</option>
-                <option value="ja">日文</option>
-            </select>
-            <label for="target-lang">目标语言:</label>
-            <select id="target-lang" style="width: 150px; height: 30px;">
-                <option value="zh">中文</option>
-                <option value="en">英文</option>
-                <option value="ja">日文</option>
-            </select>
+        <!-- 新增文件信息显示区域 -->
+        <div class="file-info-section">
+            <div class="info-container">
+                <div class="file-details">
+                    <table>
+                        <tr>
+                            <td>文件名:</td>
+                            <td>文件类型:</td>
+                            <td>文件页数:</td>
+                            <td>文件大小:</td>
+                            <td>上传进度:</td>
+                        </tr>
+                        <tr>
+                            <td id="file-name">无</td>
+                            <td id="file-type">无</td>
+                            <td id="file-pages">无</td>
+                            <td id="file-size">无</td>
+                            <td id="upload-progress">0%</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="translation-controls" id="translation-controls">
+                    <div id="language-selector">
+                        <label for="source-lang">源语言:</label>
+                        <select id="source-lang" style="width: 150px; height: 30px; margin-right: 10px;">
+                            <option value="zh">中文</option>
+                            <option value="en">英文</option>
+                            <option value="ja">日文</option>
+                        </select>
+                        <label for="target-lang">目标语言:</label>
+                        <select id="target-lang" style="width: 150px; height: 30px;">
+                            <option value="zh">中文</option>
+                            <option value="en">英文</option>
+                            <option value="ja">日文</option>
+                        </select>
+                    </div>
+                    <button id="start-translation-btn">开始翻译</button>
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -88,7 +113,7 @@
                     onprogress: function(event) {
                         if (event.lengthComputable) {
                             const percentComplete = Math.round((event.loaded / event.total) * 100);
-                            document.getElementById('progress').style.width = percentComplete + '%';
+                            document.getElementById('upload-progress').textContent = `上传进度: ${percentComplete}%`;
                         }
                     }
                 })
@@ -102,6 +127,10 @@
                 })
                 .then(data => {
                     alert(data.message);
+                    const file = files[0];
+                    document.getElementById('file-name').textContent = `文件名: ${file.name}`;
+                    document.getElementById('file-type').textContent = `文件类型: ${file.type}`;
+                    document.getElementById('file-size').textContent = `文件大小: ${(file.size / 1024).toFixed(2)} KB`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -116,6 +145,39 @@
                 document.getElementById('error-message').style.display = 'none';
             }, 10000);
         }
+
+        // 添加开始翻译按钮的点击事件
+        document.getElementById('start-translation-btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('请先上传文件');
+                return;
+            }
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('source_lang', document.getElementById('source-lang').value);
+            formData.append('target_lang', document.getElementById('target-lang').value);
+            fetch('/translate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.status);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage();
+            });
+        });
     </script>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>

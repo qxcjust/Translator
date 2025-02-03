@@ -69,3 +69,63 @@ body {
     background-repeat: no-repeat;
     background-size: 10px 10px;
 }
+
+/* 添加 file-info-section 的样式 */
+.file-info-section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/* 添加 file-details 的样式 */
+.file-details {
+    margin-bottom: 15px;
+    border: 2px dashed #ddd;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.file-details table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.file-details table td {
+    padding: 5px;
+    font-size: 14px;
+    color: #333;
+    vertical-align: top;
+}
+
+.file-details table td:first-child {
+    font-weight: bold;
+}
+
+/* 添加 translation-controls 的样式 */
+.translation-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px dashed #ddd;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+#start-translation-btn {
+    width: 150px;
+    height: 40px;
+    background-color: rgb(56, 103, 255); /* 浅蓝色背景 */
+    color: white; /* 白色字体 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
