@@ -17,11 +17,17 @@ def home():
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    data = request.json
-    file_path = data['file_path']
-    output_path = data['output_path']
+    data = request.form  # 修改为 request.form 以接收 FormData 数据
+    file_path = data.get('file_path')
+    output_path = os.path.join(os.path.dirname(file_path), f"translated_{os.path.basename(file_path)}")
     source_lang = data['source_lang']
     target_lang = data['target_lang']
+    
+    # 保存文件信息到会话或数据库中（这里仅打印）
+    print(f"File Path: {file_path}")
+    print(f"Source Language: {source_lang}")
+    print(f"Target Language: {target_lang}")
+
     translate_file.delay(file_path, output_path, source_lang, target_lang)
     return jsonify({"status": "Translation started"}), 202
 

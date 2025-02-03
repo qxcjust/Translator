@@ -124,6 +124,8 @@
                         document.getElementById('file-type').textContent = `${data.file_type}`;
                         document.getElementById('file-pages').textContent = `${data.file_pages}`;
                         document.getElementById('file-size').textContent = `${data.file_size}`;
+                        // 保存文件信息以便后续翻译
+                        window.uploadedFileInfo = data;
                     } else {
                         const data = JSON.parse(xhr.responseText);
                         console.error('Error:', data.error);
@@ -152,11 +154,8 @@
                 alert('请先上传文件');
                 return;
             }
-            const file = fileInput.files[0];
             const formData = new FormData();
-            formData.append('file', file);
-            formData.append('source_lang', document.getElementById('source-lang').value);
-            formData.append('target_lang', document.getElementById('target-lang').value);
+            
             fetch('/translate', {
                 method: 'POST',
                 body: formData
