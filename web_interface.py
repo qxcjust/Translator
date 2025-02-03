@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from task_manager import translate_file
 import os
 from datetime import datetime
+from pptx import Presentation
 
 app = Flask(__name__)
 
@@ -65,8 +66,10 @@ def upload_file():
         # 转换MIME类型到缩写形式
         file_type = mime_to_extension.get(file_mime_type, file_extension)
         
-        # 假设文件页数的计算逻辑后续实现
-        file_pages = 0  # 这里暂时设置为0
+        # 计算文件页数
+        file_pages = 0
+        prs = Presentation(file_path)
+        file_pages = len(prs.slides)
         
         return jsonify({
             "message": "File successfully uploaded",
