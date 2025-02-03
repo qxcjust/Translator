@@ -25,3 +25,14 @@ body {
 #selectFileBtn {
     margin: 10px 0; /* 增加上下间隔 */
 }
+
+#selectFileBtn {
+    width: 220px;
+    height: 41px;
+    background-color: rgb(56, 103, 255); /* 浅蓝色背景 */
+    color: white; /* 白色字体 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
