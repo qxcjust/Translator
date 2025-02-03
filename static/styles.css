@@ -54,6 +54,7 @@ body {
     width: 150px;
     height: 30px;
     margin-right: 10px;
+    margin-left: 10px; /* 添加左侧间隔 */
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 1px 10px;
