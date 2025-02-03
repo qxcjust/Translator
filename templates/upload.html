@@ -107,36 +107,32 @@
                 for (let i = 0; i < files.length; i++) {
                     formData.append('file', files[i]);
                 }
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData,
-                    onprogress: function(event) {
-                        if (event.lengthComputable) {
-                            const percentComplete = Math.round((event.loaded / event.total) * 100);
-                            document.getElementById('upload-progress').textContent = `${percentComplete}%`;
-                        }
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/upload', true);
+                xhr.upload.onprogress = function(event) {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        document.getElementById('upload-progress').textContent = `${percentComplete}%`;
                     }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            throw new Error(data.error);
-                        });
+                };
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        document.getElementById('file-name').textContent = `${data.file_name}`;
+                        document.getElementById('file-type').textContent = `${data.file_type}`;
+                        document.getElementById('file-pages').textContent = `${data.file_pages}`;
+                        document.getElementById('file-size').textContent = `${(data.file_size / 1024).toFixed(2)} KB`;
+                    } else {
+                        const data = JSON.parse(xhr.responseText);
+                        console.error('Error:', data.error);
+                        showErrorMessage();
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    //alert(data.message);
-                    // const file = files[0];
-                    document.getElementById('file-name').textContent = `${data.file_name}`;
-                    document.getElementById('file-type').textContent = `${data.file_type}`;
-                    document.getElementById('file-pages').textContent = `${data.file_pages}`;
-                    document.getElementById('file-size').textContent = `${(data.file_size / 1024).toFixed(2)} KB`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                };
+                xhr.onerror = function() {
+                    console.error('Error:', xhr.statusText);
                     showErrorMessage();
-                });
+                };
+                xhr.send(formData);
             }
         }
 
