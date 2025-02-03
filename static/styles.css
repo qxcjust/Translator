@@ -1,0 +1,23 @@
+/* ... existing code ... */
+.upload-section {
+    display: flex;
+    flex-direction: column; /* 修改为竖直布局 */
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 20px; /* 增加图标之间的间隔 */
+    border: 2px dashed #ddd; /* 添加虚线边框 */
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.upload-section img {
+    margin-bottom: 10px; /* 修改为向下间隔 */
+    height: 50px;
+}
+
+.supported-formats,
+#fileInput,
+#selectFileBtn {
+    margin: 10px 0; /* 增加上下间隔 */
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+
+        <div class="upload-section">
+            <div class="icon-section">
+                <img src="{{ url_for('static', filename='images/icon-word.png') }}" alt="Word Icon">
+                <img src="{{ url_for('static', filename='images/icon-excel.png') }}" alt="Excel Icon">
+                <img src="{{ url_for('static', filename='images/icon-powerpoint.png') }}" alt="PowerPoint Icon">
+                <img src="{{ url_for('static', filename='images/icon-pdf.png') }}" alt="PDF Icon">
+            </div>
+            <p class="supported-formats" style="color: #333;">
+                点击或拖动文件上传（可批量上传）
+            </p>
+            <input type="file" id="fileInput" multiple>
+            <button id="selectFileBtn">选择文档</button>
+            <div class="info-section">
+                <p class="supported-formats" style="color: #666;">
+                    支持23种格式：PDF、DOCX、PPT、PPTX、TXT、XLS、XLSX、SRT等
+                </p>
+                <p class="language-support" style="color: #666;">
+                    支持中、英、日、韩、俄、法、西、葡、德、越、阿拉伯语等123语种互译
+                </p>
+            </div>
+        </div>
+        <table class="translation-table">
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>页数</th>
+                    <th>文件大小</th>
+                    <th>语言方向</th>
+                    <th>翻译状态</th>
+                    <th>开始翻译时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="7">暂无数据</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>

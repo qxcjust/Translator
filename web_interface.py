@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from task_manager import translate_file
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Welcome to the Translation API"}), 200
+    return render_template('upload.html')
 
 @app.route('/translate', methods=['POST'])
 def translate():
