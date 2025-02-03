@@ -32,6 +32,13 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     if file:
+        # 获取文件扩展名
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        # 定义允许的文件类型
+        allowed_extensions = {'.docx', '.ppt', '.pptx', '.xls', '.xlsx'}
+        if file_extension not in allowed_extensions:
+            return jsonify({"error": "Invalid file type. Allowed types: DOCX, PPT, PPTX, XLS, XLSX"}), 400
+        
         # 获取当前日期并创建子文件夹
         upload_date = datetime.now().strftime('%Y-%m-%d')
         date_folder = os.path.join(app.config['UPLOAD_FOLDER'], upload_date)

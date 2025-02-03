@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1 class="page-title">智能文档翻译</h1>
-        <div class="upload-section">
+        <div class="upload-section" id="uploadSection">
             <div class="icon-section">
                 <img src="{{ url_for('static', filename='images/icon-word.png') }}" alt="Word Icon">
                 <img src="{{ url_for('static', filename='images/icon-excel.png') }}" alt="Excel Icon">
@@ -24,7 +24,7 @@
             <input type="file" id="fileInput" style="display: none;" multiple>
             <div class="info-section">
                 <p class="supported-formats" style="color: rgb(55, 69, 103);">
-                    ·支持格式：DOCX、PPT、PPTX、TXT、XLS、XLSX
+                    ·支持格式：DOCX、PPT、PPTX、XLS、XLSX
                 </p>
                 <p class="language-support" style="color: rgb(55, 69, 103);">
                     ·支持中、英、日 语种互译
@@ -41,6 +41,29 @@
         // 添加文件选择后的处理逻辑
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const files = event.target.files;
+            handleFiles(files);
+        });
+
+        // 添加拖放事件处理逻辑
+        const uploadSection = document.getElementById('uploadSection');
+        uploadSection.addEventListener('dragover', function(event) {
+            event.preventDefault();
+            uploadSection.style.borderColor = 'blue'; // 可选：改变边框颜色以提示用户
+        });
+
+        uploadSection.addEventListener('dragleave', function(event) {
+            event.preventDefault();
+            uploadSection.style.borderColor = '#ddd'; // 恢复边框颜色
+        });
+
+        uploadSection.addEventListener('drop', function(event) {
+            event.preventDefault();
+            uploadSection.style.borderColor = '#ddd'; // 恢复边框颜色
+            const files = event.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
             if (files.length > 0) {
                 const formData = new FormData();
                 for (let i = 0; i < files.length; i++) {
@@ -58,7 +81,7 @@
                     console.error('Error:', error);
                 });
             }
-        });
+        }
     </script>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
