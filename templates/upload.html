@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Upload</title>
+    <title>智能文档翻译</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -20,6 +20,8 @@
                 点击或拖动文件上传（可批量上传）
             </p>
             <button id="selectFileBtn">选择文档</button>
+            <!-- 添加隐藏的文件输入元素 -->
+            <input type="file" id="fileInput" style="display: none;" multiple>
             <div class="info-section">
                 <p class="supported-formats" style="color: rgb(55, 69, 103);">
                     ·支持格式：DOCX、PPT、PPTX、TXT、XLS、XLSX
@@ -30,6 +32,34 @@
             </div>
         </div>
     </div>
+    <script>
+        // 添加JavaScript代码以关联按钮和文件输入
+        document.getElementById('selectFileBtn').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        // 添加文件选择后的处理逻辑
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                const formData = new FormData();
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('file', files[i]);
+                }
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    </script>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
