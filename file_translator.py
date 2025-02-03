@@ -32,7 +32,7 @@ class FileTranslator:
     def translate_file(self, file_path, output_path, source_lang, target_lang):
         if file_path.endswith('.xlsx') or file_path.endswith('.xls'):
             self.translate_excel(file_path, output_path, source_lang, target_lang)
-        elif file_path.endswith('.pptx'):
+        elif file_path.endswith('.pptx') or file_path.endswith('.ppt'):
             self.translate_powerpoint(file_path, output_path, source_lang, target_lang)
         elif file_path.endswith('.docx'):
             self.translate_word(file_path, output_path, source_lang, target_lang)

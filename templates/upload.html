@@ -155,7 +155,11 @@
                 return;
             }
             const formData = new FormData();
-            
+            // 添加文件信息到 formData
+            formData.append('file_path', window.uploadedFileInfo.file_path);
+            formData.append('source_lang', document.getElementById('source-lang').value);
+            formData.append('target_lang', document.getElementById('target-lang').value);
+
             fetch('/translate', {
                 method: 'POST',
                 body: formData

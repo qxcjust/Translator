@@ -19,12 +19,23 @@ def home():
 def translate():
     data = request.form  # 修改为 request.form 以接收 FormData 数据
     file_path = data.get('file_path')
-    output_path = os.path.join(os.path.dirname(file_path), f"translated_{os.path.basename(file_path)}")
     source_lang = data['source_lang']
     target_lang = data['target_lang']
     
+    # 翻译后目标文件路径translateFiles下，以日期为子文件夹，子文件夹中放置翻译后文件，文件名后缀为filename_target_lang.
+    base_output_folder = 'translateFiles'
+    os.makedirs(base_output_folder, exist_ok=True)
+    upload_date = datetime.now().strftime('%Y-%m-%d')
+    date_folder = os.path.join(base_output_folder, upload_date)
+    os.makedirs(date_folder, exist_ok=True)
+    
+    file_name, file_extension = os.path.splitext(os.path.basename(file_path))
+    output_file_name = f"{file_name}_{target_lang}{file_extension}"
+    output_path = os.path.join(date_folder, output_file_name)
+    
     # 保存文件信息到会话或数据库中（这里仅打印）
     print(f"File Path: {file_path}")
+    print(f"Output Path: {output_path}")
     print(f"Source Language: {source_lang}")
     print(f"Target Language: {target_lang}")
 
