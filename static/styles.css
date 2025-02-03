@@ -3,6 +3,14 @@ body {
     font-family: '微软雅黑', sans-serif; /* 添加全局字体设置 */
 }
 
+/* 添加 .page-title 类的样式 */
+.page-title {
+    font-size: 24px;
+    color: #374567;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
 .upload-section {
     display: flex;
     flex-direction: column; /* 修改为竖直布局 */
