@@ -83,8 +83,10 @@ body {
 .file-details {
     margin-bottom: 15px;
     border: 2px dashed #ddd;
-    padding: 20px;
+    padding: 10px;
     border-radius: 5px;
+    width: 50%; /* 修改宽度为50% */
+    height: 100%; /* 确保高度可拉伸 */
 }
 
 .file-details table {
@@ -92,15 +94,19 @@ body {
     border-collapse: collapse;
 }
 
+/* table的第一行tr的样式 */
+.file-details table tr:first-child {
+    border-bottom: 1px dashed #ddd;
+    font-weight: bold; /* 加粗显示 */
+}
+
 .file-details table td {
     padding: 5px;
     font-size: 14px;
+    /* 文字居中显示 */
+    text-align: center;
     color: #333;
     vertical-align: top;
-}
-
-.file-details table td:first-child {
-    font-weight: bold;
 }
 
 /* 添加 translation-controls 的样式 */
@@ -111,6 +117,8 @@ body {
     border: 2px dashed #ddd;
     padding: 20px;
     border-radius: 5px;
+    width: 40%; /* 修改宽度为40% */
+    height: 100%; /* 确保高度可拉伸 */
 }
 
 #start-translation-btn {
@@ -127,5 +135,6 @@ body {
 .info-container {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: stretch; /* 修改为 stretch 以保持高度一致 */
+    height: 100%; /* 确保高度可拉伸 */
 }
