@@ -138,3 +138,31 @@ body {
     align-items: stretch; /* 修改为 stretch 以保持高度一致 */
     height: 100%; /* 确保高度可拉伸 */
 }
+
+.translation-status-section {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.translation-status-section .status-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.translation-status-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.translation-status-section th, .translation-status-section td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.translation-status-section th {
+    background-color: #f2f2f2;
+}

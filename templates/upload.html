@@ -71,6 +71,27 @@
                 </div>
             </div>
         </div>
+        <!-- 新增翻译文件信息显示区域 -->
+        <div class="translation-status-section">
+            <div class="status-container">
+                <table id="translation-status-table">
+                    <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>页数</th>
+                            <th>文件大小</th>
+                            <th>语言方向</th>
+                            <th>翻译状态</th>
+                            <th>开始翻译时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="translation-status-table-body">
+                        <!-- 动态生成的行将添加到这里 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <script>
         // 添加JavaScript代码以关联按钮和文件输入
@@ -187,6 +208,49 @@
                 console.error('Error:', error);
             });
         });
+
+        // 更新文件翻译信息和状态
+        function updateTranslationStatus(fileInfo) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${fileInfo.file_name}</td>
+                <td>${fileInfo.file_pages}</td>
+                <td>${fileInfo.file_size}</td>
+                <td>${fileInfo.source_lang} -> ${fileInfo.target_lang}</td>
+                <td>${fileInfo.status}</td>
+                <td>${fileInfo.start_time}</td>
+                <td><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
+            `;
+            document.getElementById('translation-status-table-body').appendChild(newRow);
+
+            // 如果翻译完成，显示下载按钮
+            if (fileInfo.status === 'completed') {
+                document.getElementById('download-translated-file').style.display = 'block';
+            } else {
+                document.getElementById('download-translated-file').style.display = 'none';
+            }
+        }
+
+        // 下载翻译后的文件
+        function downloadTranslatedFile(filePath) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `/download?file_path=${filePath}`, true);
+            xhr.responseType = 'blob';
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const blob = xhr.response;
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filePath.split('/').pop();
+                    a.click();
+                } else {
+                    console.error('Error:', xhr.statusText);
+                }
+            };
+            xhr.send();
+        }
+
     </script>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
