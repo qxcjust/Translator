@@ -45,5 +45,9 @@
    ```
 
 ## 使用方法
+1. 启动服务：redis-server
+2. 启动服务：celery -A task_manager.celery worker --loglevel=info
+3. 启动服务：python web_interface.py
+
 
 ### 通过命令行翻译文件
