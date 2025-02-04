@@ -105,27 +105,42 @@ def task_status(task_id):
 
         if task.state == 'PROGRESS':
             # 处理进行中的任务
-            response.update({
-                'progress': task.info.get('progress', 0.0),
-                'current': task.info.get('current', 0),
-                'total': task.info.get('total', 1)
-            })
+            if task.info is not None:
+                response.update({
+                    'progress': task.info.get('progress', 0.0),
+                    'current': task.info.get('current', 0),
+                    'total': task.info.get('total', 1)
+                })
+            else:
+                response.update({
+                    'progress': 0.0,
+                    'current': 0,
+                    'total': 1
+                })
         elif task.state == 'SUCCESS' or task.state == 'PENDING':
             # 处理成功完成的任务
             result = task.result
-            response.update({
-                'progress': 100.0,
-                'current': result.get('current', 1),
-                'total': result.get('total', 1),
-                'translated_file_path': result.get('translated_file_path')
-            })
+            if result is not None:
+                response.update({
+                    'progress': 100.0,
+                    'current': result.get('current', 1),
+                    'total': result.get('total', 1),
+                    'translated_file_path': result.get('translated_file_path')
+                })
+            else:
+                response.update({
+                    'progress': 100.0,
+                    'current': 1,
+                    'total': 1,
+                    'translated_file_path': None
+                })
         elif task.state == 'FAILURE':
             # 处理失败任务
             response.update({
                 'error': str(task.result),
                 'progress': 100.0  # 标记为完全结束
             })
-        
+        print(response)
         return jsonify(response)
     
     except Exception as e:

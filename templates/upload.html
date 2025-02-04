@@ -267,7 +267,7 @@
                 .then(data => {
                     if (data.state === 'PROGRESS') {
                         document.getElementById(`translation-progress-${taskId}`).textContent = `${data.progress}%`;
-                    } else if (data.state === 'SUCCESS') {
+                    } else if (data.state === 'SUCCESS' || data.state === 'PENDING') {
                         document.getElementById(`translation-progress-${taskId}`).textContent = '100%';
                         clearInterval(pollTranslationProgress);
                     }
