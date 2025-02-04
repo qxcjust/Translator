@@ -24,33 +24,6 @@ celery.conf.update(app.config)
 def home():
     return render_template('upload.html')
 
-@app.route('/translate', methods=['POST'])
-def translate():
-    data = request.form  # 修改为 request.form 以接收 FormData 数据
-    file_path = data.get('file_path')
-    source_lang = data['source_lang']
-    target_lang = data['target_lang']
-    
-    # 翻译后目标文件路径translateFiles下，以日期为子文件夹，子文件夹中放置翻译后文件，文件名后缀为filename_target_lang.
-    base_output_folder = 'translateFiles'
-    os.makedirs(base_output_folder, exist_ok=True)
-    upload_date = datetime.now().strftime('%Y-%m-%d')
-    date_folder = os.path.join(base_output_folder, upload_date)
-    os.makedirs(date_folder, exist_ok=True)
-    
-    file_name, file_extension = os.path.splitext(os.path.basename(file_path))
-    output_file_name = f"{file_name}_{target_lang}{file_extension}"
-    output_path = os.path.join(date_folder, output_file_name)
-    
-    # 保存文件信息到会话或数据库中（这里仅打印）
-    print(f"File Path: {file_path}")
-    print(f"Output Path: {output_path}")
-    print(f"Source Language: {source_lang}")
-    print(f"Target Language: {target_lang}")
-
-    translate_file.delay(file_path, output_path, source_lang, target_lang)
-    return jsonify({"status": "Translation started"}), 202
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -99,8 +72,12 @@ def upload_file():
         
         # 计算文件页数
         file_pages = 0
-        prs = Presentation(file_path)
-        file_pages = len(prs.slides)
+        try:
+            prs = Presentation(file_path)
+            file_pages = len(prs.slides)
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            file_pages = 0
         
         return jsonify({
             "message": "File successfully uploaded",
@@ -110,6 +87,40 @@ def upload_file():
             "file_size": file_size,
             "file_pages": file_pages
         }), 200
+
+@app.route('/translate', methods=['POST'])
+def translate():
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    
+    data = request.form  # 修改为 request.form 以接收 FormData 数据
+    file_path = data.get('file_path')
+    source_lang = data['source_lang']
+    target_lang = data['target_lang']
+    
+    # 翻译后目标文件路径translateFiles下，以日期为子文件夹，子文件夹中放置翻译后文件，文件名后缀为filename_target_lang.
+    base_output_folder = 'translateFiles'
+    os.makedirs(base_output_folder, exist_ok=True)
+    upload_date = datetime.now().strftime('%Y-%m-%d')
+    date_folder = os.path.join(base_output_folder, upload_date)
+    os.makedirs(date_folder, exist_ok=True)
+    
+    file_name, file_extension = os.path.splitext(os.path.basename(file_path))
+    output_file_name = f"{file_name}_{target_lang}{file_extension}"
+    output_path = os.path.join(date_folder, output_file_name)
+    
+    # 保存文件信息到会话或数据库中（这里仅打印）
+    logging.info(f"File Path: {file_path}")
+    logging.info(f"Output Path: {output_path}")
+    logging.info(f"Source Language: {source_lang}")
+    logging.info(f"Target Language: {target_lang}")
+
+    try:
+        translate_file.delay(file_path, output_path, source_lang, target_lang)
+        return jsonify({"status": "Translation started"}), 202
+    except Exception as e:
+        logging.error(f"Error starting translation: {e}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

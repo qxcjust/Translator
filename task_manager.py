@@ -1,7 +1,7 @@
 from celery import Celery
 from translation_core import TranslationCore
 
-app = Celery('task_manager', broker='pyamqp://guest@localhost//')
+app = Celery('task_manager', broker='redis://localhost:6379/0')
 
 @app.task
 def translate_file(file_path, output_path, source_lang, target_lang):
