@@ -172,3 +172,7 @@ cython_debug/
 
 # mac 文件
 .DS_Store
+
+# Uploadfile and transfer file
+uploadfile/
+transferfile/
