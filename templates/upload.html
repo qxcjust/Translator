@@ -55,16 +55,16 @@
                         <label for="source-lang">源语言:</label>
                         <select id="source-lang" style="width: 150px; height: 30px; margin-right: 10px;">
                             <option value="undefined">请选择源语言</option> <!-- 添加空选项 -->
-                            <option value="zh">中文</option>
-                            <option value="en">英文</option>
-                            <option value="ja">日文</option>
+                            <option value="Chinese">中文</option>
+                            <option value="English">英文</option>
+                            <option value="Japanese">日文</option>
                         </select>
                         <label for="target-lang">目标语言:</label>
                         <select id="target-lang" style="width: 150px; height: 30px;">
                             <option value="undefined">请选择目标语言</option> <!-- 添加空选项 -->
-                            <option value="zh">中文</option>
-                            <option value="en">英文</option>
-                            <option value="ja">日文</option>
+                            <option value="Chinese">中文</option>
+                            <option value="English">英文</option>
+                            <option value="Japanese">日文</option>
                         </select>
                     </div>
                     <button id="start-translation-btn">开始翻译</button>
@@ -150,13 +150,21 @@
         // 添加开始翻译按钮的点击事件
         document.getElementById('start-translation-btn').addEventListener('click', function() {
             const fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length === 0) {
+            if (fileInput.files.length === 0 || !window.uploadedFileInfo || !window.uploadedFileInfo.file_path ) {
                 alert('请先上传文件');
                 return;
             }
             const formData = new FormData();
-            // 添加文件信息到 formData
+            // 添加文件信息到 formData，添加前需要检查数据的有效性
             formData.append('file_path', window.uploadedFileInfo.file_path);
+            if (document.getElementById('source-lang').value === 'undefined' || document.getElementById('target-lang').value === 'undefined') {
+                alert('请选择源语言和目标语言');
+                return;
+            }
+            if (document.getElementById('source-lang').value === document.getElementById('target-lang').value) {
+                alert('源语言和目标语言不能相同');
+                return;
+            }
             formData.append('source_lang', document.getElementById('source-lang').value);
             formData.append('target_lang', document.getElementById('target-lang').value);
 

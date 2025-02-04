@@ -1,7 +1,7 @@
 import pandas as pd
 from pptx import Presentation
 from openpyxl import load_workbook
-from docx import Document
+from docx import Document  # 现在会指向正确的 python-docx 包
 
 def parse_excel(file_path):
     return pd.read_excel(file_path)
