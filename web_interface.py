@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify, render_template
 from task_manager import translate_file
 import os
 from datetime import datetime
-from pptx import Presentation
 from celery import Celery
 import logging
+import time
+from file_parsers import get_file_pages, get_file_size
+
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -56,17 +58,12 @@ def upload_file():
         file.save(file_path)
         
         # 获取文件大小
-        file_size = os.path.getsize(file_path)
-        # 格式化文件大小，文件大小过大的话，则用MB表示
-        if file_size > 1024 * 1024:
-            file_size = f"{file_size / (1024 * 1024):.2f} MB"
-        else:
-            file_size = f"{file_size / 1024:.2f} KB"
+        file_size = get_file_size(file_path)
         
         # 获取文件MIME类型
         file_mime_type = file.content_type
         
-        # 定义MIME类型到缩写形式的映射
+        # 转换MIME类型到缩写形式
         mime_to_extension = {
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
             'application/vnd.ms-powerpoint': 'PPT',
@@ -78,15 +75,6 @@ def upload_file():
         # 转换MIME类型到缩写形式
         file_type = mime_to_extension.get(file_mime_type, file_extension)
         
-        # 计算文件页数
-        file_pages = 0
-        try:
-            prs = Presentation(file_path)
-            file_pages = len(prs.slides)
-        except Exception as e:
-            logging.error(f"Error reading file: {e}")
-            file_pages = 0
-        
         logging.info(f"File uploaded successfully: {file_path}")
         return jsonify({
             "message": "File successfully uploaded",
@@ -94,9 +82,11 @@ def upload_file():
             "file_name": file.filename,
             "file_type": file_type,
             "file_size": file_size,
-            "file_pages": file_pages
+            "file_pages": get_file_pages(file_path)
         }), 200
 
+# 假设有一个全局字典来存储任务状态
+translate_task_status = {}
 @app.route('/translate', methods=['POST'])
 def translate():
     data = request.form  # 修改为 request.form 以接收 FormData 数据
@@ -122,12 +112,28 @@ def translate():
     logging.info(f"Target Language: {target_lang}")
 
     try:
-        translate_file.delay(file_path, output_path, source_lang, target_lang)
-        logging.info(f"Translation started for file: {file_path}")
-        return jsonify({"status": "Translation started"}), 202
+        # 开始翻译任务
+        task = translate_file.delay(file_path, output_path, source_lang, target_lang)
+        # 返回翻译任务信息
+        translation_info = {
+            'file_name': os.path.basename(file_path),
+            'file_pages': get_file_pages(file_path),
+            'file_size': get_file_size(file_path),
+            'source_lang': source_lang,
+            'target_lang': target_lang,
+            'status': '0%',
+            'start_time': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'translated_file_path': None  # 翻译完成后更新此路径
+        }     
+        # 保存任务ID以便后续查询状态
+        task_id = task.id
+        translate_task_status[task_id] = translation_info
+        return jsonify({'task_id': task_id, 'translation_info': translation_info, 'status': 'Translation started'})
     except Exception as e:
         logging.error(f"Error starting translation: {e}")
         return jsonify({"error": str(e)}), 500
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

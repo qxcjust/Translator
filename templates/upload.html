@@ -168,6 +168,28 @@
             }, 10000);
         }
 
+        // 更新文件翻译信息和状态
+        function updateTranslationStatus(fileInfo) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${fileInfo.file_name}</td>
+                <td>${fileInfo.file_pages}</td>
+                <td>${fileInfo.file_size}</td>
+                <td>${fileInfo.source_lang} -> ${fileInfo.target_lang}</td>
+                <td>${fileInfo.status}</td>
+                <td>${fileInfo.start_time}</td>
+                <td><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
+            `;
+            document.getElementById('translation-status-table-body').appendChild(newRow);
+
+            // 如果翻译完成，显示下载按钮
+            if (fileInfo.status === 'completed') {
+                document.getElementById('download-translated-file').style.display = 'block';
+            } else {
+                document.getElementById('download-translated-file').style.display = 'none';
+            }
+        }
+
         // 添加开始翻译按钮的点击事件
         document.getElementById('start-translation-btn').addEventListener('click', function() {
             const fileInput = document.getElementById('fileInput');
@@ -202,34 +224,23 @@
                 return response.json();
             })
             .then(data => {
-                alert(data.status);
+                // 更新翻译状态
+                const fileInfo = {
+                    file_name: data.translation_info.file_name,
+                    file_pages: data.translation_info.file_pages,
+                    file_size: data.translation_info.file_size,
+                    source_lang: data.translation_info.source_lang,
+                    target_lang: data.translation_info.target_lang,
+                    status: data.translation_info.status,
+                    start_time: data.translation_info.start_time,
+                    translated_file_path: data.translation_info.translated_file_path
+                };
+                updateTranslationStatus(fileInfo);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         });
-
-        // 更新文件翻译信息和状态
-        function updateTranslationStatus(fileInfo) {
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>${fileInfo.file_name}</td>
-                <td>${fileInfo.file_pages}</td>
-                <td>${fileInfo.file_size}</td>
-                <td>${fileInfo.source_lang} -> ${fileInfo.target_lang}</td>
-                <td>${fileInfo.status}</td>
-                <td>${fileInfo.start_time}</td>
-                <td><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
-            `;
-            document.getElementById('translation-status-table-body').appendChild(newRow);
-
-            // 如果翻译完成，显示下载按钮
-            if (fileInfo.status === 'completed') {
-                document.getElementById('download-translated-file').style.display = 'block';
-            } else {
-                document.getElementById('download-translated-file').style.display = 'none';
-            }
-        }
 
         // 下载翻译后的文件
         function downloadTranslatedFile(filePath) {
