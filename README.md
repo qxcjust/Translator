@@ -7,7 +7,7 @@
 - `file_parsers.py`: 文件解析层，负责解析不同类型的文件。
 - `translation_core.py`: 翻译核心层，封装了Ollama API接口。
 - `format_preserver.py`: 格式保持层，负责保存翻译后的文件并保持原有格式。
-- `task_manager.py`: 任务管理层，使用Celery进行分布式任务队列管理。
+- `task_manager.py`: 任务管理层，使用Celery和Redis进行分布式任务队列管理。
 - `web_interface.py`: 用户界面层，提供Web界面和命令行CLI。
 - `cli_interface.py`: 命令行接口，方便用户通过命令行进行文件翻译。
 
@@ -18,6 +18,7 @@
 - docx
 - ollama_client
 - celery
+- redis
 - flask
 - click
 - pyamqp
