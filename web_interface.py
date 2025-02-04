@@ -105,12 +105,11 @@ def task_status(task_id):
 
         if task.state == 'PROGRESS':
             # 处理进行中的任务
-            if task.info is not None:  # 添加空值检查
-                response.update({
-                    'progress': task.info.get('progress', 0.0),
-                    'current': task.info.get('current', 0),
-                    'total': task.info.get('total', 1)
-                })
+            response.update({
+                'progress': task.info.get('progress', 0.0),
+                'current': task.info.get('current', 0),
+                'total': task.info.get('total', 1)
+            })
         elif task.state == 'SUCCESS' or task.state == 'PENDING':
             # 处理成功完成的任务
             result = task.result
