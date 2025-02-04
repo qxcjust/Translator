@@ -176,18 +176,12 @@
                 <td>${fileInfo.file_pages}</td>
                 <td>${fileInfo.file_size}</td>
                 <td>${fileInfo.source_lang} -> ${fileInfo.target_lang}</td>
-                <td>${fileInfo.status}</td>
+                <td id="translation-progress-${fileInfo.task_id}">0%</td>
                 <td>${fileInfo.start_time}</td>
                 <td><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
             `;
             document.getElementById('translation-status-table-body').appendChild(newRow);
 
-            // 如果翻译完成，显示下载按钮
-            if (fileInfo.status === 'completed') {
-                document.getElementById('download-translated-file').style.display = 'block';
-            } else {
-                document.getElementById('download-translated-file').style.display = 'none';
-            }
         }
 
         // 添加开始翻译按钮的点击事件
@@ -233,9 +227,12 @@
                     target_lang: data.translation_info.target_lang,
                     status: data.translation_info.status,
                     start_time: data.translation_info.start_time,
-                    translated_file_path: data.translation_info.translated_file_path
+                    translated_file_path: data.translation_info.translated_file_path,
+                    task_id: data.task_id
                 };
                 updateTranslationStatus(fileInfo);
+                // 开始轮询翻译进度
+                pollTranslationProgress(data.task_id);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -260,6 +257,25 @@
                 }
             };
             xhr.send();
+        }
+
+        // 轮询翻译进度
+        function pollTranslationProgress(taskId) {
+            setInterval(() => {
+                fetch(`/task_status/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.state === 'PROGRESS') {
+                        document.getElementById(`translation-progress-${taskId}`).textContent = `${data.progress}%`;
+                    } else if (data.state === 'SUCCESS') {
+                        document.getElementById(`translation-progress-${taskId}`).textContent = '100%';
+                        clearInterval(pollTranslationProgress);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }, 5000); // 每秒查询一次进度
         }
 
     </script>

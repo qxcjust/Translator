@@ -6,6 +6,7 @@ from celery import Celery
 import logging
 import time
 from file_parsers import get_file_pages, get_file_size
+from celery.result import AsyncResult
 
 
 # 配置日志记录
@@ -25,7 +26,6 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 # 初始化Celery
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
-
 @app.route('/')
 def home():
     return render_template('upload.html')
@@ -87,6 +87,52 @@ def upload_file():
 
 # 假设有一个全局字典来存储任务状态
 translate_task_status = {}
+
+@app.route('/task_status/<task_id>', methods=['GET'])
+def task_status(task_id):
+    try:
+        task = AsyncResult(task_id, app=celery)
+        
+        # 基础响应结构
+        response = {
+            'state': task.state,
+            'progress': 0.0,
+            'current': 0,
+            'total': 1,
+            'translated_file_path': None,
+            'error': None
+        }
+
+        if task.state == 'PROGRESS':
+            # 处理进行中的任务
+            if task.info is not None:  # 添加空值检查
+                response.update({
+                    'progress': task.info.get('progress', 0.0),
+                    'current': task.info.get('current', 0),
+                    'total': task.info.get('total', 1)
+                })
+        elif task.state == 'SUCCESS' or task.state == 'PENDING':
+            # 处理成功完成的任务
+            result = task.result
+            response.update({
+                'progress': 100.0,
+                'current': result.get('current', 1),
+                'total': result.get('total', 1),
+                'translated_file_path': result.get('translated_file_path')
+            })
+        elif task.state == 'FAILURE':
+            # 处理失败任务
+            response.update({
+                'error': str(task.result),
+                'progress': 100.0  # 标记为完全结束
+            })
+        
+        return jsonify(response)
+    
+    except Exception as e:
+        logging.error(f"查询任务状态失败: {str(e)}")
+        return jsonify({'error': '内部服务器错误'}), 500
+
 @app.route('/translate', methods=['POST'])
 def translate():
     data = request.form  # 修改为 request.form 以接收 FormData 数据
@@ -112,8 +158,12 @@ def translate():
     logging.info(f"Target Language: {target_lang}")
 
     try:
-        # 开始翻译任务
-        task = translate_file.delay(file_path, output_path, source_lang, target_lang)
+        # 启动异步任务
+        task = translate_file.apply_async(
+            args=(file_path, output_path, source_lang, target_lang),
+            kwargs={}
+        )
+        
         # 返回翻译任务信息
         translation_info = {
             'file_name': os.path.basename(file_path),
@@ -127,6 +177,7 @@ def translate():
         }     
         # 保存任务ID以便后续查询状态
         task_id = task.id
+        logging.info(f"task id:{task_id}")
         translate_task_status[task_id] = translation_info
         return jsonify({'task_id': task_id, 'translation_info': translation_info, 'status': 'Translation started'})
     except Exception as e:
