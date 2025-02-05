@@ -116,7 +116,8 @@ def translate():
     try:
         # 启动异步任务
         task = translate_file.apply_async(
-            args=(file_path, output_path, source_lang, target_lang)
+            args=(file_path, output_path, source_lang, target_lang),
+            kwargs={}
         )
         
         # 返回翻译任务信息
@@ -156,7 +157,7 @@ def task_status(task_id):
         if task.state == 'PROGRESS':
             meta = task.info
             response.update({
-                'progress': round(meta.get('progress', 0.0), 1),  # 格式化为小数点后一位
+                'progress': meta.get('progress', 0.0),
                 'current': meta.get('current', 0),
                 'total': meta.get('total', 1)
             })

@@ -269,7 +269,7 @@
                         document.getElementById(`translation-progress-${taskId}`).textContent = `${data.progress}%`;
                     } else if (data.state === 'SUCCESS') {
                         document.getElementById(`translation-progress-${taskId}`).textContent = '100%';
-                        //字体颜色改为绿色 并加粗
+                        // 字体颜色改为绿色 并加粗
                         document.getElementById(`translation-progress-${taskId}`).style.fontWeight = 'bold';
                         document.getElementById(`translation-progress-${taskId}`).style.color = 'green';
                         // 显示下载按钮
@@ -277,19 +277,20 @@
                         // 更新Click函数，
                         document.getElementById(`download-btn-${taskId}`).onclick = function() {
                             downloadTranslatedFile(data.translated_file_path);
-                        };                      
+                        };
                         clearInterval(intervalId); // 使用正确的定时器ID停止轮询
                     } else if (data.state === 'FAILURE') {
                         document.getElementById(`translation-progress-${taskId}`).textContent = 'Translation failed';
-                        //字体颜色改为红色
+                        // 字体颜色改为红色
                         document.getElementById(`translation-progress-${taskId}`).style.color = 'red';
                         document.getElementById(`translation-progress-${taskId}`).style.fontWeight = 'bold';
                         clearInterval(intervalId); // 使用正确的定时器ID停止轮询
                         console.error('Translation failed:', data.error); // 可选：在控制台输出错误信息
-                    }
+                    } 
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    clearInterval(intervalId); // 停止轮询以避免无限循环
                 });
             }, 5000); // 每秒查询一次进度
         }
