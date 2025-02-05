@@ -3,6 +3,7 @@ from file_parsers import parse_excel, parse_powerpoint, parse_word
 from format_preserver import save_translated_excel, save_translated_powerpoint, save_translated_word
 from translation_core import TranslationCore
 from celery import shared_task
+from ppt_translator import translate_powerpoint  # 添加导入
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -19,19 +20,6 @@ class FileTranslator:
         save_translated_excel(translated_df, output_path)
         logging.info(f"Completed translation of Excel file: {file_path}")
         task.update_state(state='PROGRESS', meta={'current': total_rows, 'total': total_rows, 'progress': 100.0})
-
-    def translate_powerpoint(self, file_path, output_path, source_lang, target_lang, task):
-        logging.info(f"Starting translation of PowerPoint file: {file_path}")
-        prs = parse_powerpoint(file_path)
-        total_slides = len(prs.slides)
-        for i, slide in enumerate(prs.slides):
-            for shape in slide.shapes:
-                if hasattr(shape, "text"):
-                    logging.info(f"Text: {shape.text} Source Lang: {source_lang} Target Lang: {target_lang}")
-                    shape.text = self.translation_core.translate_text(shape.text, source_lang, target_lang)
-            task.update_state(state='PROGRESS', meta={'current': i + 1, 'total': total_slides, 'progress': ((i + 1) / total_slides) * 100.0})
-        save_translated_powerpoint(prs, output_path)
-        logging.info(f"Completed translation of PowerPoint file: {file_path}")
 
     def translate_word(self, file_path, output_path, source_lang, target_lang, task):
         logging.info(f"Starting translation of Word file: {file_path}")
@@ -54,7 +42,7 @@ class FileTranslator:
             # 更新状态为 SUCCESS 并传递 translated_file_path
             self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})            
         elif file_path.endswith('.pptx') or file_path.endswith('.ppt'):
-            self.translate_powerpoint(file_path, output_path, source_lang, target_lang, task)
+            translate_powerpoint(self.translation_core, file_path, output_path, source_lang, target_lang, task) 
             # 更新状态为 SUCCESS 并传递 translated_file_path
             self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         elif file_path.endswith('.docx'):
