@@ -178,7 +178,7 @@
                 <td>${fileInfo.source_lang} -> ${fileInfo.target_lang}</td>
                 <td id="translation-progress-${fileInfo.task_id}">0%</td>
                 <td>${fileInfo.start_time}</td>
-                <td><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
+                <td id="download-btn-${fileInfo.task_id}" style="display:none"><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
             `;
             document.getElementById('translation-status-table-body').appendChild(newRow);
 
@@ -261,7 +261,7 @@
 
         // 轮询翻译进度
         function pollTranslationProgress(taskId) {
-            setInterval(() => {
+            const intervalId = setInterval(() => {
                 fetch(`/task_status/${taskId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -269,7 +269,23 @@
                         document.getElementById(`translation-progress-${taskId}`).textContent = `${data.progress}%`;
                     } else if (data.state === 'SUCCESS') {
                         document.getElementById(`translation-progress-${taskId}`).textContent = '100%';
-                        clearInterval(pollTranslationProgress);
+                        //字体颜色改为绿色 并加粗
+                        document.getElementById(`translation-progress-${taskId}`).style.fontWeight = 'bold';
+                        document.getElementById(`translation-progress-${taskId}`).style.color = 'green';
+                        // 显示下载按钮
+                        document.getElementById(`download-btn-${taskId}`).style.display = 'inline';
+                        // 更新Click函数，
+                        document.getElementById(`download-btn-${taskId}`).onclick = function() {
+                            downloadTranslatedFile(data.translated_file_path);
+                        };                      
+                        clearInterval(intervalId); // 使用正确的定时器ID停止轮询
+                    } else if (data.state === 'FAILURE') {
+                        document.getElementById(`translation-progress-${taskId}`).textContent = 'Translation failed';
+                        //字体颜色改为红色
+                        document.getElementById(`translation-progress-${taskId}`).style.color = 'red';
+                        document.getElementById(`translation-progress-${taskId}`).style.fontWeight = 'bold';
+                        clearInterval(intervalId); // 使用正确的定时器ID停止轮询
+                        console.error('Translation failed:', data.error); // 可选：在控制台输出错误信息
                     }
                 })
                 .catch(error => {
