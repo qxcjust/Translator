@@ -22,9 +22,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
 app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
-# 初始化Celery
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-celery.conf.update(app.config)
+# 修改 Celery 初始化配置
+celery = Celery(app.name, 
+                broker=app.config['CELERY_BROKER_URL'],
+                backend=app.config['CELERY_RESULT_BACKEND'])
 
 @app.route('/')
 def home():
@@ -115,8 +116,7 @@ def translate():
     try:
         # 启动异步任务
         task = translate_file.apply_async(
-            args=(file_path, output_path, source_lang, target_lang),
-            kwargs={}
+            args=(file_path, output_path, source_lang, target_lang)
         )
         
         # 返回翻译任务信息

@@ -1,12 +1,11 @@
 from celery import Celery
 from file_translator import FileTranslator
 import logging
-
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
-
-# 确保Celery配置正确
-app = Celery('task_manager', broker='redis://localhost:6379/0')
+app = Celery('task_manager', 
+             broker='redis://localhost:6379/0',
+             backend='redis://localhost:6379/0')  # 添加结果后端
 
 @app.task(bind=True)
 def translate_file(self, file_path, output_path, source_lang, target_lang):
