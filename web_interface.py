@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from task_manager import translate_file
+from task_manager import translate_file, app as celery
 import os
 from datetime import datetime
 from celery import Celery
@@ -7,7 +7,6 @@ import logging
 import time
 from file_parsers import get_file_pages, get_file_size
 from celery.result import AsyncResult
-
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +25,11 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 # 初始化Celery
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
+
 @app.route('/')
 def home():
     return render_template('upload.html')
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     logging.info("Handling file upload request")
@@ -87,49 +88,6 @@ def upload_file():
 # 假设有一个全局字典来存储任务状态
 translate_task_status = {}
 
-@app.route('/task_status/<task_id>', methods=['GET'])
-def task_status(task_id):
-    try:
-        task = AsyncResult(task_id, app=celery)
-        # 基础响应结构
-        response = {
-            'state': task.state,
-            'progress': 0.0,
-            'current': 0,
-            'total': 1,
-            'translated_file_path': None,
-            'error': None
-        }
-
-        if task.state == 'PROGRESS':
-            meta = task.info
-            response.update({
-                'progress': meta.get('progress', 0.0),
-                'current': meta.get('current', 0),
-                'total': meta.get('total', 1)
-            })
-        elif task.state == 'SUCCESS':
-            # 处理成功完成的任务
-            meta = task.info
-            response.update({
-                'progress': 100.0,
-                'current': meta.get('current', 1),
-                'total': meta.get('total', 1),
-                'translated_file_path': meta.get('translated_file_path')
-            })
-        elif task.state == 'FAILURE':
-            # 处理失败任务
-            response.update({
-                'error': str(task.result),
-                'progress': 100.0  # 标记为完全结束
-            })
-        print(response)
-        return jsonify(response)
-    
-    except Exception as e:
-        logging.error(f"查询任务状态失败: {str(e)}")
-        return jsonify({'error': '内部服务器错误'}), 500
-
 @app.route('/translate', methods=['POST'])
 def translate():
     data = request.form  # 修改为 request.form 以接收 FormData 数据
@@ -180,6 +138,49 @@ def translate():
     except Exception as e:
         logging.error(f"Error starting translation: {e}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/task_status/<task_id>', methods=['GET'])
+def task_status(task_id):
+    try:
+        task = AsyncResult(task_id, app=celery)
+        # 基础响应结构
+        response = {
+            'state': task.state,
+            'progress': 0.0,
+            'current': 0,
+            'total': 1,
+            'translated_file_path': None,
+            'error': None
+        }
+
+        if task.state == 'PROGRESS':
+            meta = task.info
+            response.update({
+                'progress': meta.get('progress', 0.0),
+                'current': meta.get('current', 0),
+                'total': meta.get('total', 1)
+            })
+        elif task.state == 'SUCCESS':
+            # 处理成功完成的任务
+            meta = task.info
+            response.update({
+                'progress': 100.0,
+                'current': meta.get('current', 1),
+                'total': meta.get('total', 1),
+                'translated_file_path': meta.get('translated_file_path')
+            })
+        elif task.state == 'FAILURE':
+            # 处理失败任务
+            response.update({
+                'error': str(task.result),
+                'progress': 100.0  # 标记为完全结束
+            })
+        print(response)
+        return jsonify(response)
+    
+    except Exception as e:
+        logging.error(f"查询任务状态失败: {str(e)}")
+        return jsonify({'error': '内部服务器错误'}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -5,6 +5,7 @@ import logging
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
 
+# 确保Celery配置正确
 app = Celery('task_manager', broker='redis://localhost:6379/0')
 
 @app.task(bind=True)

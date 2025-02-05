@@ -20,7 +20,6 @@ class FileTranslator:
         logging.info(f"Completed translation of Excel file: {file_path}")
         task.update_state(state='PROGRESS', meta={'current': total_rows, 'total': total_rows, 'progress': 100.0})
 
-
     def translate_powerpoint(self, file_path, output_path, source_lang, target_lang, task):
         logging.info(f"Starting translation of PowerPoint file: {file_path}")
         prs = parse_powerpoint(file_path)
@@ -33,7 +32,6 @@ class FileTranslator:
             task.update_state(state='PROGRESS', meta={'current': i + 1, 'total': total_slides, 'progress': ((i + 1) / total_slides) * 100.0})
         save_translated_powerpoint(prs, output_path)
         logging.info(f"Completed translation of PowerPoint file: {file_path}")
-
 
     def translate_word(self, file_path, output_path, source_lang, target_lang, task):
         logging.info(f"Starting translation of Word file: {file_path}")
