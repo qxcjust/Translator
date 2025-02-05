@@ -29,7 +29,6 @@ celery.conf.update(app.config)
 @app.route('/')
 def home():
     return render_template('upload.html')
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     logging.info("Handling file upload request")
@@ -92,7 +91,6 @@ translate_task_status = {}
 def task_status(task_id):
     try:
         task = AsyncResult(task_id, app=celery)
-        
         # 基础响应结构
         response = {
             'state': task.state,

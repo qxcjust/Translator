@@ -15,6 +15,8 @@ def translate_file(self, file_path, output_path, source_lang, target_lang):
         logging.info(f"Initializing translation for file: {file_path}")
         file_translator.translate_file(file_path, output_path, source_lang, target_lang, self)
         logging.info(f"Translation completed for file: {file_path}")
+        # 更新状态为 SUCCESS 并传递 translated_file_path
+        self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
     except Exception as e:
         logging.error(f"Error during translation for file {file_path}: {e}")
         self.update_state(state='FAILURE', meta={'error': str(e)})
