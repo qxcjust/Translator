@@ -157,7 +157,7 @@ def task_status(task_id):
         if task.state == 'PROGRESS':
             meta = task.info
             response.update({
-                'progress': meta.get('progress', 0.0),
+                'progress': float(f"{meta.get('progress', 0.0):.1f}"),  # 格式化为小数点后1位
                 'current': meta.get('current', 0),
                 'total': meta.get('total', 1)
             })

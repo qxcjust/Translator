@@ -51,10 +51,17 @@ class FileTranslator:
         logging.info(f"Starting translation of file: {file_path}")
         if file_path.endswith('.xlsx') or file_path.endswith('.xls'):
             self.translate_excel(file_path, output_path, source_lang, target_lang, task)
+            # 更新状态为 SUCCESS 并传递 translated_file_path
+            self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})            
         elif file_path.endswith('.pptx') or file_path.endswith('.ppt'):
             self.translate_powerpoint(file_path, output_path, source_lang, target_lang, task)
+            # 更新状态为 SUCCESS 并传递 translated_file_path
+            self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         elif file_path.endswith('.docx'):
             self.translate_word(file_path, output_path, source_lang, target_lang, task)
+            # 更新状态为 SUCCESS 并传递 translated_file_path
+            self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         else:
+            self.update_state(state='FAILURE', meta={'error': "Unsupported file type"})
             raise ValueError("Unsupported file type")
         logging.info(f"Completed translation of file: {file_path}")
