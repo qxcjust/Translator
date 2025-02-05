@@ -160,6 +160,7 @@ body {
 .translation-status-section th, .translation-status-section td {
     padding: 10px;
     text-align: center;
+    vertical-align: center; /* 垂直居中 */
     border-bottom: 1px solid #ddd;
 }
 

@@ -178,7 +178,9 @@
                 <td>${fileInfo.source_lang} -> ${fileInfo.target_lang}</td>
                 <td id="translation-progress-${fileInfo.task_id}">0%</td>
                 <td>${fileInfo.start_time}</td>
-                <td id="download-btn-${fileInfo.task_id}" style="display:none"><button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button></td>
+                <td id="download-btn-${fileInfo.task_id}" style="display:none;">
+                    <button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button>
+                </td>
             `;
             document.getElementById('translation-status-table-body').appendChild(newRow);
 
@@ -273,7 +275,7 @@
                         document.getElementById(`translation-progress-${taskId}`).style.fontWeight = 'bold';
                         document.getElementById(`translation-progress-${taskId}`).style.color = 'green';
                         // 显示下载按钮
-                        document.getElementById(`download-btn-${taskId}`).style.display = 'inline';
+                        document.getElementById(`download-btn-${taskId}`).style.display = 'block';
                         // 更新Click函数，
                         document.getElementById(`download-btn-${taskId}`).onclick = function() {
                             downloadTranslatedFile(data.translated_file_path);
