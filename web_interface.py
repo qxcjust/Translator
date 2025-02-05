@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 from task_manager import translate_file, app as celery
 import os
 from datetime import datetime
@@ -182,6 +182,22 @@ def task_status(task_id):
     except Exception as e:
         logging.error(f"查询任务状态失败: {str(e)}")
         return jsonify({'error': '内部服务器错误'}), 500
+
+@app.route('/download', methods=['GET'])
+def download():
+    file_path = request.args.get('file_path')
+    if not file_path:
+        return jsonify({"error": "No file path provided"}), 400
+    
+    # 检查文件是否存在
+    if not os.path.exists(file_path):
+        return jsonify({"error": "File not found"}), 404
+    
+    # 提取文件名
+    file_name = os.path.basename(file_path)
+    
+    # 发送文件
+    return send_from_directory(os.path.dirname(file_path), file_name, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
