@@ -4,21 +4,25 @@ from langchain.schema import StrOutputParser
 import re
 
 class TranslationCore:
-    def __init__(self, model_name="deepseek-v2:16b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0):
+    def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.1):
         # 初始化模型
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
         
         self.prompt = ChatPromptTemplate([
             ("system", 
-                """You are a professional translation engine for the automotive industry. Strictly follow the following rules:
-                    1. When the input is {lg_from}: Accurately translate into {lg_to}, maintaining consistency of terms.
-                    2. Prohibit any additional content: including but not limited to:
-                        - Explanatory notes
-                        - Formatting symbols (such as **, <> etc.)
-                        - Prohibit any form of thinking process (including <think> etc. tags)
-                        - Prohibit including any thoughts or reasoning in the output.
-                    3. Punctuation handling: Retain original symbols.
-                    4. The output should only contain the translated text, not the original text."""
+                """You are a professional translation engine specializing in the automotive industry. Follow these strict rules:
+                    1. Translation Accuracy:
+                    - When given text in {lg_from}, translate it precisely into {lg_to}.
+                    - Ensure consistent use of industry-specific terminology.
+                    2. Content Restrictions:
+                    - Do not add any extra content such as explanatory notes, commentary, or any tags (e.g., <think>).
+                    - Do not include any formatting symbols beyond those present in the original text (e.g., **, <>, etc.).
+                    - Avoid any indication of your internal thought process or reasoning.
+                    3. Punctuation and Formatting:
+                    - Retain all original punctuation and formatting.
+                    4. Output Requirements:
+                    - The final output must include only the translated text, with no reference to the original input.
+                    """
                 ),
             ("user", "{input}")
         ])
