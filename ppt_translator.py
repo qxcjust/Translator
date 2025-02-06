@@ -42,8 +42,8 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                             if cell.text.strip():
                                 logging.info(f"Table cell text: {cell.text} Source Lang: {source_lang} Target Lang: {target_lang}")
                                 cell.text = translation_core.translate_text(cell.text, source_lang, target_lang)
-
-            task.update_state(state='PROGRESS', meta={'current': i + 1, 'total': total_slides, 'progress': ((i + 1) / total_slides) * 100.0})
+            if task is not None:
+                task.update_state(state='PROGRESS', meta={'current': i + 1, 'total': total_slides, 'progress': ((i + 1) / total_slides) * 100.0})
         
         save_translated_powerpoint(prs, output_path)
         logging.info(f"Completed translation of PowerPoint file: {file_path}")
@@ -51,5 +51,6 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
     except Exception as e:
         logging.error(f"Error during translation for file {file_path}: {e}")
         logging.error(traceback.format_exc())
-        task.update_state(state='FAILURE', meta={'exc_type': type(e).__name__, 'exc_message': str(e), 'traceback': traceback.format_exc()})
+        if task is not None:
+            task.update_state(state='FAILURE', meta={'exc_type': type(e).__name__, 'exc_message': str(e), 'traceback': traceback.format_exc()})
         raise

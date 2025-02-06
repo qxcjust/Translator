@@ -1,6 +1,6 @@
 import logging
-from file_parsers import parse_excel, parse_powerpoint, parse_word
-from format_preserver import save_translated_excel, save_translated_powerpoint, save_translated_word
+from file_parsers import parse_excel, parse_word
+from format_preserver import save_translated_excel, save_translated_word
 from translation_core import TranslationCore
 from celery import shared_task
 from ppt_translator import translate_powerpoint  # 添加导入
@@ -39,17 +39,18 @@ class FileTranslator:
         logging.info(f"Starting translation of file: {file_path}")
         if file_path.endswith('.xlsx') or file_path.endswith('.xls'):
             self.translate_excel(file_path, output_path, source_lang, target_lang, task)
-            # 更新状态为 SUCCESS 并传递 translated_file_path
-            self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})            
+            if task is not None:
+                task.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         elif file_path.endswith('.pptx') or file_path.endswith('.ppt'):
-            translate_powerpoint(self.translation_core, file_path, output_path, source_lang, target_lang, task) 
-            # 更新状态为 SUCCESS 并传递 translated_file_path
-            self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
+            translate_powerpoint(self.translation_core, file_path, output_path, source_lang, target_lang, task)
+            if task is not None:
+                task.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         elif file_path.endswith('.docx'):
             self.translate_word(file_path, output_path, source_lang, target_lang, task)
-            # 更新状态为 SUCCESS 并传递 translated_file_path
-            self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
+            if task is not None:
+                task.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         else:
-            self.update_state(state='FAILURE', meta={'error': "Unsupported file type"})
+            if task is not None:
+                task.update_state(state='FAILURE', meta={'error': "Unsupported file type"})
             raise ValueError(f"Unsupported file type: {file_path}")
         logging.info(f"Completed translation of file: {file_path}")
