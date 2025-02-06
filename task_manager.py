@@ -8,9 +8,6 @@ from redis.exceptions import ConnectionError
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
 
-# Windows平台特定设置
-os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
-
 app = Celery('task_manager', 
              broker='redis://localhost:6379/0',
              backend='redis://localhost:6379/0')

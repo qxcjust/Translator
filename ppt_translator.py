@@ -3,7 +3,6 @@ from file_parsers import parse_powerpoint
 from format_preserver import save_translated_powerpoint
 from translation_core import TranslationCore
 from pptx import Presentation
-from pptx.util import Pt
 import traceback
 
 # 配置日志记录

@@ -2,7 +2,6 @@ import logging
 from file_parsers import parse_excel, parse_word
 from format_preserver import save_translated_excel, save_translated_word
 from translation_core import TranslationCore
-from celery import shared_task
 from ppt_translator import translate_powerpoint  # 添加导入
 
 # 配置日志记录
