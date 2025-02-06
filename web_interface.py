@@ -7,8 +7,6 @@ import logging
 import time
 from file_parsers import get_file_pages, get_file_size
 from celery.result import AsyncResult
-from redis import Redis, ConnectionPool
-import socket
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -20,56 +18,14 @@ UPLOAD_FOLDER = 'Updatefile'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Redis连接配置
-REDIS_HOST = '127.0.0.1'  # 明确使用IP而不是hostname
-REDIS_PORT = 6379
-REDIS_DB = 0
-REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
-
-# 创建Redis连接池
-REDIS_POOL = ConnectionPool(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    db=REDIS_DB,
-    decode_responses=True,
-    socket_timeout=30,
-    socket_connect_timeout=30,
-    socket_keepalive=True,
-    retry_on_timeout=True
-)
-
-def check_redis_connection():
-    """检查Redis连接是否可用"""
-    try:
-        client = Redis(connection_pool=REDIS_POOL)
-        client.ping()
-        return True
-    except Exception as e:
-        logging.error(f"Redis连接失败: {str(e)}")
-        return False
-
 # Celery配置
-app.config['CELERY_BROKER_URL'] = REDIS_URL
-app.config['CELERY_RESULT_BACKEND'] = REDIS_URL
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
 # 修改 Celery 初始化配置
 celery = Celery(app.name, 
                 broker=app.config['CELERY_BROKER_URL'],
                 backend=app.config['CELERY_RESULT_BACKEND'])
-
-# 添加Celery配置
-celery.conf.update(
-    broker_connection_retry=True,
-    broker_connection_retry_on_startup=True,
-    broker_connection_max_retries=5,
-    broker_connection_timeout=30,
-    broker_transport_options={
-        'visibility_timeout': 3600,
-        'socket_timeout': 30,
-        'socket_connect_timeout': 30,
-        'retry_on_timeout': True
-    }
-)
 
 @app.route('/')
 def home():
@@ -135,13 +91,7 @@ translate_task_status = {}
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    # 检查Redis连接
-    if not check_redis_connection():
-        return jsonify({
-            "error": "Redis服务未启动或无法连接，请检查Redis服务状态"
-        }), 500
-
-    data = request.form
+    data = request.form  # 修改为 request.form 以接收 FormData 数据
     file_path = data.get('file_path')
     source_lang = data['source_lang']
     target_lang = data['target_lang']
@@ -177,7 +127,7 @@ def translate():
             'file_size': get_file_size(file_path),
             'source_lang': source_lang,
             'target_lang': target_lang,
-            'status': '0%', 
+            'status': '0%',
             'start_time': time.strftime('%Y-%m-%d %H:%M:%S'),
             'translated_file_path': None  # 翻译完成后更新此路径
         }     
