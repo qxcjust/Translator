@@ -48,7 +48,6 @@
 1. 启动服务：redis-server
 2. 启动服务：celery -A task_manager  worker --loglevel=info --pool=solo
 3. 启动服务：python web_interface.py
-4. Redis服务：.\redis-server.exe redis.windows.conf  #windows上使用
 
 
 ### 通过命令行翻译文件
