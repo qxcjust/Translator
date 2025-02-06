@@ -180,37 +180,78 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
     logging.info(f"开始翻译PowerPoint文件: {file_path}")
     try:
         prs = Presentation(file_path)
-        total_slides = len(prs.slides)
-        current_slide = 0
+        
+        # 计算总工作量
+        total_work = 0
+        current_work = 0
+        
+        # 预扫描所有需要翻译的内容
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if shape.has_text_frame:
+                    for paragraph in shape.text_frame.paragraphs:
+                        if len(paragraph.runs) > 0:
+                            for run in paragraph.runs:
+                                if run.text.strip():
+                                    total_work += len(run.text)
+                        else:
+                            if paragraph.text.strip():
+                                total_work += len(paragraph.text)
+                elif shape.has_table:
+                    for row in shape.table.rows:
+                        for cell in row.cells:
+                            if cell.text.strip():
+                                total_work += len(cell.text)
 
         for slide in prs.slides:
-            current_slide += 1
             for shape in slide.shapes:
                 # 处理文本框
                 if shape.has_text_frame:
                     text_frame = shape.text_frame
-                    # 保存段落级别的格式
                     paragraph_formats = []
                     for paragraph in text_frame.paragraphs:
-                        # 保存段落对齐方式
                         alignment = paragraph.alignment
-                        # 保存段落中所有运行的格式和文本
                         runs_info = []
                         if len(paragraph.runs) > 0:
                             for run in paragraph.runs:
                                 if run.text.strip():
                                     format_info = get_text_format(run)
-                                    translated_text = translate_text_with_format(translation_core, run.text, source_lang, target_lang)
+                                    translated_text = translate_text_with_format(
+                                        translation_core, run.text, source_lang, target_lang
+                                    )
                                     runs_info.append((translated_text, format_info))
+                                    # 更新进度
+                                    current_work += len(run.text)
+                                    progress = (current_work / total_work) * 100
+                                    task.update_state(
+                                        state='PROGRESS',
+                                        meta={
+                                            'current': current_work,
+                                            'total': total_work,
+                                            'progress': round(progress, 1)
+                                        }
+                                    )
                         else:
-                            # 处理没有运行但有文本的段落
                             if paragraph.text.strip():
-                                translated_text = translate_text_with_format(translation_core, paragraph.text, source_lang, target_lang)
+                                translated_text = translate_text_with_format(
+                                    translation_core, paragraph.text, source_lang, target_lang
+                                )
                                 runs_info.append((translated_text, TextFormat()))
+                                # 更新进度
+                                current_work += len(paragraph.text)
+                                progress = (current_work / total_work) * 100
+                                task.update_state(
+                                    state='PROGRESS',
+                                    meta={
+                                        'current': current_work,
+                                        'total': total_work,
+                                        'progress': round(progress, 1)
+                                    }
+                                )
                         
                         paragraph_formats.append((alignment, runs_info))
                     
-                    # 清空文本框并重新应用翻译后的文本和格式
+                    # 应用翻译和格式
                     text_frame.clear()
                     for alignment, runs_info in paragraph_formats:
                         p = text_frame.add_paragraph()
@@ -219,14 +260,13 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                         for text, format_info in runs_info:
                             run = p.add_run()
                             run.text = text
-                            apply_text_format(run, format_info)
+                            apply_text_format(run, format_info, shape, text)
 
                 # 处理表格
                 elif shape.has_table:
                     for row in shape.table.rows:
                         for cell in row.cells:
                             if cell.text.strip():
-                                # 保存单元格中的格式信息
                                 cell_formats = []
                                 for paragraph in cell.text_frame.paragraphs:
                                     alignment = paragraph.alignment
@@ -234,11 +274,24 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                     for run in paragraph.runs:
                                         if run.text.strip():
                                             format_info = get_text_format(run)
-                                            translated_text = translate_text_with_format(translation_core, run.text, source_lang, target_lang)
+                                            translated_text = translate_text_with_format(
+                                                translation_core, run.text, source_lang, target_lang
+                                            )
                                             runs_info.append((translated_text, format_info))
+                                            # 更新进度
+                                            current_work += len(run.text)
+                                            progress = (current_work / total_work) * 100
+                                            task.update_state(
+                                                state='PROGRESS',
+                                                meta={
+                                                    'current': current_work,
+                                                    'total': total_work,
+                                                    'progress': round(progress, 1)
+                                                }
+                                            )
                                     cell_formats.append((alignment, runs_info))
                                 
-                                # 清空单元格并重新应用翻译后的文本和格式
+                                # 应用翻译和格式
                                 cell.text_frame.clear()
                                 for alignment, runs_info in cell_formats:
                                     p = cell.text_frame.add_paragraph()
@@ -248,18 +301,6 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                         run = p.add_run()
                                         run.text = text
                                         apply_text_format(run, format_info)
-
-            # 更新进度
-            if task is not None:
-                progress = (current_slide / total_slides) * 100
-                task.update_state(
-                    state='PROGRESS',
-                    meta={
-                        'current': current_slide,
-                        'total': total_slides,
-                        'progress': round(progress, 1)
-                    }
-                )
 
         # 保存翻译后的文件
         prs.save(output_path)
