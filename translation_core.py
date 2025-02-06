@@ -1,6 +1,7 @@
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import StrOutputParser
+import re
 
 class TranslationCore:
     def __init__(self, model_name="deepseek-v2:16b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0):
@@ -29,6 +30,11 @@ class TranslationCore:
         self.chain = self.prompt | self.llm | self.output_parser
 
     def translate_text(self, text, source_lang, target_lang):
-        # 使用聊天链进行翻译
-        response = self.chain.invoke({"input": text, "lg_from": source_lang, "lg_to": target_lang})
-        return response
+        if re.match(r'^\s*$', text):
+            translated_text = ""
+        elif re.match(r'^[a-zA-Z0-9]+$', text):
+            translated_text = text
+        else:
+            response = self.chain.invoke({"input": text, "lg_from": source_lang, "lg_to": target_lang})
+            translated_text = response
+        return translated_text

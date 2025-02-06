@@ -51,5 +51,5 @@ class FileTranslator:
             self.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         else:
             self.update_state(state='FAILURE', meta={'error': "Unsupported file type"})
-            raise ValueError("Unsupported file type")
+            raise ValueError(f"Unsupported file type: {file_path}")
         logging.info(f"Completed translation of file: {file_path}")

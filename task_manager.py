@@ -1,19 +1,52 @@
 from celery import Celery
 from file_translator import FileTranslator
 import logging
+import os
+from redis import Redis
+from redis.exceptions import ConnectionError
+
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
+
+# Windows平台特定设置
+os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
+
 app = Celery('task_manager', 
              broker='redis://localhost:6379/0',
-             backend='redis://localhost:6379/0')  # 添加结果后端
+             backend='redis://localhost:6379/0')
+
+class TranslationError(Exception):
+    """自定义翻译异常类"""
+    pass
 
 @app.task(bind=True)
 def translate_file(self, file_path, output_path, source_lang, target_lang):
+    """
+    文件翻译任务
+    """
     logging.info(f"Starting translation for file: {file_path}")
     file_translator = FileTranslator()
     try:
         logging.info(f"Initializing translation for file: {file_path}")
         file_translator.translate_file(file_path, output_path, source_lang, target_lang, self)
         logging.info(f"Translation completed for file: {file_path}")
+        
+        return {
+            'current': 1,
+            'total': 1,
+            'progress': 100.0,
+            'translated_file_path': output_path
+        }
+        
     except Exception as e:
-        logging.error(f"Error during translation for file {file_path}: {e}")
+        logging.error(f"Error during translation for file {file_path}: {str(e)}")
+        error = TranslationError(f"Translation failed: {str(e)}")
+        self.update_state(
+            state='FAILURE',
+            meta={
+                'exc_type': type(error).__name__,
+                'exc_message': str(error),
+                'error': str(error)
+            }
+        )
+        raise error
