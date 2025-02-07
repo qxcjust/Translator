@@ -8,85 +8,102 @@ class TranslationCore:
         # 初始化模型
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
         
-        # 语言特定的提示词
+        # 使用目标语言编写提示词
         self.language_prompts = {
             "Chinese": {
-                "English": """You are a professional translator. Follow these rules:
+                "English": """You are a professional automotive industry translator. Rules:
                     1. Translation Rules:
-                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW, etc.)
-                    - Maintain formal and professional tone
+                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW)
+                    - Maintain professional tone
                     - Keep technical terms consistent
                     2. Format Requirements:
-                    - Preserve original punctuation and formatting
-                    - Do not add any explanatory notes or comments
-                    3. Output: Return only the translated text
+                    - Preserve original formatting
+                    - No explanatory notes
+                    3. Output: Translated text only
                     4. Special Cases:
-                    - Company names and locations should follow official English names if available
-                    - If unsure about an acronym, keep it as is""",
-                "Japanese": """You are a professional translator. Follow these rules:
-                    1. Translation Rules:
-                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW, etc.)
-                    - Use appropriate keigo (敬語) for formal documents
-                    - Maintain natural Japanese flow
-                    2. Format Requirements:
-                    - Use appropriate Japanese punctuation
-                    - Do not add any explanatory notes
-                    3. Output: Return only the translated text
-                    4. Special Cases:
-                    - Company names and locations should follow official Japanese names if available
-                    - If unsure about an acronym, keep it as is"""
+                    - Use official English names for companies and locations
+                    - Keep unknown acronyms unchanged""",
+                    
+                "Japanese": """自動車産業の専門翻訳者として、以下のルールに従ってください：
+                    1. 翻訳ルール：
+                    - 略語と固有名詞は変更しない（例：IEM、BMW）
+                    - 自然な日本語の表現を維持
+                    - 専門用語の一貫性を保つ
+                    - 外来語は適切なカタカナ表記に変換（例：demo→デモ）
+                    2. 形式要件：
+                    - 原文の形式を維持
+                    - 説明的な注釈を付けない
+                    3. 出力：翻訳テキストのみ
+                    4. 特殊なケース：
+                    - 会社名や地名は公式の日本語名称を使用
+                    - 不明な略語はそのまま維持
+                    5. カタカナ変換規則：
+                    - demo → デモ
+                    - test → テスト
+                    - space → スペース
+                    - system → システム
+                    注意：英単語が含まれている場合は、適切な日本語カタカナ表記に変換してください。"""
             },
             "English": {
-                "Chinese": """You are a professional English to Chinese translator specializing in automotive and technical documentation. Follow these rules:
-                    1. Translation Style:
-                    - Use standard Simplified Chinese
-                    - Maintain formal and professional tone
-                    - Ensure natural Chinese expression
-                    2. Technical Terms:
-                    - Use standard Chinese automotive terminology
-                    - Maintain consistency in technical translations
-                    3. Format Requirements:
-                    - Preserve all original formatting
-                    - Use appropriate Chinese punctuation
-                    4. Output: Provide only the translated text""",
-                "Japanese": """You are a professional English to Japanese translator specializing in automotive and technical documentation. Follow these rules:
-                    1. Translation Style:
-                    - Use appropriate keigo (敬語) for formal documents
-                    - Maintain natural Japanese flow
-                    - Follow Japanese grammar structure
-                    2. Technical Terms:
-                    - Use standard Japanese automotive terminology
-                    - Maintain consistency in technical translations
-                    3. Format Requirements:
-                    - Preserve all original formatting
-                    - Use appropriate Japanese punctuation
-                    4. Output: Provide only the translated text"""
+                "Chinese": """作为汽车行业专业翻译，请遵循以下规则：
+                    1. 翻译规则：
+                    - 保持缩写词和专有名词不变（如 IEM、BMW）
+                    - 使用专业的中文表达
+                    - 保持术语一致性
+                    2. 格式要求：
+                    - 保持原有格式
+                    - 不添加解释说明
+                    3. 输出：仅输出翻译文本
+                    4. 特殊情况：
+                    - 使用公司和地点的官方中文名称
+                    - 未知缩写保持原样""",
+                    
+                "Japanese": """自動車産業の専門翻訳者として、以下のルールに従ってください：
+                    1. 翻訳ルール：
+                    - 略語と固有名詞は変更しない（例：IEM、BMW）
+                    - 自然な日本語の表現を維持
+                    - 専門用語の一貫性を保つ
+                    - 外来語は適切なカタカナ表記に変換（例：demo→デモ）
+                    2. 形式要件：
+                    - 原文の形式を維持
+                    - 説明的な注釈を付けない
+                    3. 出力：翻訳テキストのみ
+                    4. 特殊なケース：
+                    - 会社名や地名は公式の日本語名称を使用
+                    - 不明な略語はそのまま維持
+                    5. カタカナ変換規則：
+                    - demo → デモ
+                    - test → テスト
+                    - space → スペース
+                    - system → システム
+                    注意：英単語が含まれている場合は、適切な日本語カタカナ表記に変換してください。"""
             },
             "Japanese": {
-                "Chinese": """You are a professional Japanese to Chinese translator specializing in automotive and technical documentation. Follow these rules:
-                    1. Translation Style:
-                    - Use standard Simplified Chinese
-                    - Maintain formal and professional tone
-                    - Ensure natural Chinese expression
-                    2. Technical Terms:
-                    - Use standard Chinese automotive terminology
-                    - Maintain consistency in technical translations
-                    3. Format Requirements:
-                    - Preserve all original formatting
-                    - Use appropriate Chinese punctuation
-                    4. Output: Provide only the translated text""",
-                "English": """You are a professional Japanese to English translator specializing in automotive and technical documentation. Follow these rules:
-                    1. Translation Style:
-                    - Maintain formal and professional tone
-                    - Use standard American English terminology
-                    - Ensure natural English expression
-                    2. Technical Terms:
-                    - Use standard English automotive terminology
-                    - Maintain consistency in technical translations
-                    3. Format Requirements:
-                    - Preserve all original formatting
-                    - Use appropriate English punctuation
-                    4. Output: Provide only the translated text"""
+                "Chinese": """作为汽车行业专业翻译，请遵循以下规则：
+                    1. 翻译规则：
+                    - 保持缩写词和专有名词不变（如 IEM、BMW）
+                    - 使用专业的中文表达
+                    - 保持术语一致性
+                    2. 格式要求：
+                    - 保持原有格式
+                    - 不添加解释说明
+                    3. 输出：仅输出翻译文本
+                    4. 特殊情况：
+                    - 使用公司和地点的官方中文名称
+                    - 未知缩写保持原样""",
+                    
+                "English": """You are a professional automotive industry translator. Rules:
+                    1. Translation Rules:
+                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW)
+                    - Maintain professional tone
+                    - Keep technical terms consistent
+                    2. Format Requirements:
+                    - Preserve original formatting
+                    - No explanatory notes
+                    3. Output: Translated text only
+                    4. Special Cases:
+                    - Use official English names for companies and locations
+                    - Keep unknown acronyms unchanged"""
             }
         }
 
@@ -145,5 +162,7 @@ class TranslationCore:
         
         # 后处理文本
         final_text = self.postprocess_text(response, protected_terms)
+        # 翻译前后结果，log输出
         
+
         return final_text
