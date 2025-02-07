@@ -4,7 +4,7 @@ from langchain.schema import StrOutputParser
 import re
 
 class TranslationCore:
-    def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.1):
+    def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.0):
         # 初始化模型
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
         
