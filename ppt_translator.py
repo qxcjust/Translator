@@ -288,12 +288,15 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                         paragraph = text_frame.add_paragraph()
                         if alignment is not None:
                             paragraph.alignment = alignment  # 确保保留原始对齐方式
+                        start_index = 0
                         for text, format_infos in runs_info:
-                            split_texts = split_text_into_parts(text,len(format_infos),target_lang)
+                            # 将翻译后的文本按原始run数量拆分
+                            split_texts = split_text_into_parts(text, len(format_infos), target_lang)
                             for split_text, format_info in zip(split_texts, format_infos):
                                 run = paragraph.add_run()
                                 run.text = split_text
                                 apply_text_format(run, format_info, shape, split_text)
+                                start_index += len(split_text)
 
                 # 处理表格
                 elif shape.has_table:
@@ -331,20 +334,22 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                             )
 
                                     cell_formats.append((alignment, runs_info))
-                                
+                            
                                 # 应用翻译和格式
                                 cell.text_frame.clear()
                                 for alignment, runs_info in cell_formats:
                                     paragraph = cell.text_frame.add_paragraph()
                                     if alignment is not None:
                                         paragraph.alignment = alignment  # 确保保留原始对齐方式
+                                    start_index = 0
                                     for text, format_infos in runs_info:
                                         # 将翻译后的文本按原始run数量拆分
                                         split_texts = split_text_into_parts(text, len(format_infos), target_lang)
                                         for split_text, format_info in zip(split_texts, format_infos):
                                             run = paragraph.add_run()
                                             run.text = split_text
-                                            apply_text_format(run, format_info, cell, split_text)
+                                            apply_text_format(run, format_info, cell.text_frame, split_text)  # 修改此处，传递 cell.text_frame 而不是 cell
+                                            start_index += len(split_text)
 
         # 保存翻译后的文件
         prs.save(output_path)
