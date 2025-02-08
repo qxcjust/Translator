@@ -32,12 +32,7 @@
 2. 创建虚拟环境并激活：
    ```bash
    python -m venv venv
-   source venv/bin/activate  # 在Windows上使用 `venv\Scripts\activate`
-   ```
-   ```bash
-   # 在MAC OS上使用以下命令
-   python3 -m venv venv
-   source venv/bin/activate
+   source venv/Scripts/activate  # 在Windows上使用git bash或者mingw64等环境下用同等命令
    ```
 3. 安装依赖：
    ```bash
