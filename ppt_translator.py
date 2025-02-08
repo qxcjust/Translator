@@ -74,7 +74,7 @@ def calculate_font_size(shape, text, original_size):
         estimated_lines = len(text) / chars_per_line
         
         # 计算每行所需的高度
-        line_height = Pt(original_size) * 1.5  # 1.5是行间距系数
+        line_height = Pt(original_size) * 1.0  # 1.5是行间距系数
         
         # 计算所需的总高度
         required_height = line_height * estimated_lines
@@ -266,9 +266,6 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                 translation_core, combined_text, source_lang, target_lang
                             )
                             
-                            # 计算适合的字体大小
-                            adapted_size = calculate_font_size(shape, translated_text, format_infos[0].font_size if format_infos[0].font_size else 18)
-                            
                             runs_info.append((translated_text, format_infos))
                             # 更新进度
                             current_work += len(combined_text)
@@ -288,15 +285,13 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                     # 应用翻译和格式
                     text_frame.clear()
                     for alignment, runs_info in paragraph_formats:
-                        p = text_frame.add_paragraph()
+                        paragraph = text_frame.add_paragraph()
                         if alignment is not None:
-                            p.alignment = alignment
+                            paragraph.alignment = alignment  # 确保保留原始对齐方式
                         for text, format_infos in runs_info:
-                            # 将翻译后的文本按原始run数量拆分
-                            #split_texts = [text[i:i+len(text)//len(format_infos)] for i in range(0, len(text), len(text)//len(format_infos))]
                             split_texts = split_text_into_parts(text,len(format_infos),target_lang)
                             for split_text, format_info in zip(split_texts, format_infos):
-                                run = p.add_run()
+                                run = paragraph.add_run()
                                 run.text = split_text
                                 apply_text_format(run, format_info, shape, split_text)
 
@@ -320,10 +315,7 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                         translated_text = translate_text_with_format(
                                             translation_core, combined_text, source_lang, target_lang
                                         )
-                                        
-                                        # 计算适合的字体大小
-                                        adapted_size = calculate_font_size(cell, translated_text, format_infos[0].font_size if format_infos[0].font_size else 18)
-                                        
+                                                                                
                                         runs_info.append((translated_text, format_infos))
                                         # 更新进度
                                         current_work += len(combined_text)
@@ -343,17 +335,16 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                 # 应用翻译和格式
                                 cell.text_frame.clear()
                                 for alignment, runs_info in cell_formats:
-                                    p = cell.text_frame.add_paragraph()
+                                    paragraph = cell.text_frame.add_paragraph()
                                     if alignment is not None:
-                                        p.alignment = alignment
+                                        paragraph.alignment = alignment  # 确保保留原始对齐方式
                                     for text, format_infos in runs_info:
                                         # 将翻译后的文本按原始run数量拆分
-                                        #split_texts = [text[i:i+len(text)//len(format_infos)] for i in range(0, len(text), len(text)//len(format_infos))]
-                                        split_texts = split_text_into_parts(text,len(format_infos))
+                                        split_texts = split_text_into_parts(text, len(format_infos), target_lang)
                                         for split_text, format_info in zip(split_texts, format_infos):
-                                            run = p.add_run()
+                                            run = paragraph.add_run()
                                             run.text = split_text
-                                            apply_text_format(run, format_info)
+                                            apply_text_format(run, format_info, cell, split_text)
 
         # 保存翻译后的文件
         prs.save(output_path)
