@@ -9,108 +9,115 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 class TranslationCore:
-    def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.0):
+    def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.2):
         # 初始化模型
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
         
         # 使用目标语言编写提示词
         self.language_prompts = {
             "Chinese": {
-                "English": """You are a professional automotive industry translator. Rules:
+                "English": """You are a professional translator for the automotive industry. Follow these rules:
                     1. Translation Rules:
-                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW)
-                    - Maintain professional tone
-                    - Keep technical terms consistent
+                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW).
+                    - Maintain a professional and technical tone.
+                    - Ensure consistency in technical terms.
                     2. Format Requirements:
-                    - Preserve original formatting
-                    - No explanatory notes
-                    3. Output: Translated text only
+                    - Preserve original formatting.
+                    - Do not add explanations, comments, or footnotes.
+                    3. Output Requirements:
+                    - Only provide the translated text without any additional information.
                     4. Special Cases:
-                    - Use official English names for companies and locations
-                    - Keep unknown acronyms unchanged""",
-                    
+                    - Use official English names for companies and locations.
+                    - Keep unknown acronyms unchanged.""",
+
                 "Japanese": """自動車産業の専門翻訳者として、以下のルールに従ってください：
                     1. 翻訳ルール：
-                    - 略語と固有名詞は変更しない（例：IEM、BMW）
-                    - 自然な日本語の表現を維持
-                    - 専門用語の一貫性を保つ
-                    - 外来語は適切なカタカナ表記に変換（例：demo→デモ）
+                    - 略語や固有名詞（例：IEM、BMW）はそのまま維持。
+                    - 正確かつ専門的な日本語表現を使用。
+                    - 技術用語の一貫性を保持。
+                    - 自然な日本語表現を使用し、**簡体字を日本語で使われる漢字に変換**してください。
+                    - **簡体字（例：「体」、「国」、「区」）は日本語の漢字（例：「體」、「國」、「區」）に置き換えてください**。
+                    - 外来語は適切なカタカナ表記に変換（例：demo → デモ）。
                     2. 形式要件：
-                    - 原文の形式を維持
-                    - 説明的な注釈を付けない
-                    3. 出力：翻訳テキストのみ
+                    - 原文のフォーマットを保持。
+                    - 注釈や説明を追加しない。
+                    3. 出力要件：
+                    - 翻訳されたテキストのみを提供し、それ以外の情報を含めない。
                     4. 特殊なケース：
-                    - 会社名や地名は公式の日本語名称を使用
-                    - 不明な略語はそのまま維持
-                    5. カタカナ変換規則：
-                    - demo → デモ
-                    - test → テスト
-                    - space → スペース
-                    - system → システム
-                    注意：英単語が含まれている場合は、適切な日本語カタカナ表記に変換してください。"""
+                    - 会社名や地名は公式の日本語表記を使用。
+                    - 不明な略語はそのまま維持。
+                    5. **漢字変換の例**：
+                    - 简体字「体」→ 日本語「體」
+                    - 简体字「国」→ 日本語「國」
+                    - 简体字「区」→ 日本語「區」
+                    - 简体字「话」→ 日本語「話」
+                    - 简体字「学」→ 日本語「學」
+                    - 简体字「议题」→ 日本語「議題」
+                    **注意**：すべての簡体字は、日本語で一般的に使用される漢字に変換してください。"""
             },
+
             "English": {
-                "Chinese": """作为汽车行业专业翻译，请遵循以下规则：
+                "Chinese": """作为汽车行业的专业翻译，请严格遵循以下规则：
                     1. 翻译规则：
-                    - 保持缩写词和专有名词不变（如 IEM、BMW）
-                    - 使用专业的中文表达
-                    - 保持术语一致性
+                    - 保持缩写词和专有名词不变（如 IEM、BMW）。
+                    - 采用专业且正式的中文表达。
+                    - 确保技术术语的一致性。
                     2. 格式要求：
-                    - 保持原有格式
-                    - 不添加解释说明
-                    3. 输出：仅输出翻译文本
+                    - 维持原始格式。
+                    - 不添加解释、注释或额外内容。
+                    3. 输出要求：
+                    - 仅提供翻译文本，不包含其他信息。
                     4. 特殊情况：
-                    - 使用公司和地点的官方中文名称
-                    - 未知缩写保持原样""",
-                    
+                    - 公司和地名使用官方的中文名称。
+                    - 未知缩写保持原样。""",
+
                 "Japanese": """自動車産業の専門翻訳者として、以下のルールに従ってください：
                     1. 翻訳ルール：
-                    - 略語と固有名詞は変更しない（例：IEM、BMW）
-                    - 自然な日本語の表現を維持
-                    - 専門用語の一貫性を保つ
-                    - 外来語は適切なカタカナ表記に変換（例：demo→デモ）
+                    - 略語や固有名詞（例：IEM、BMW）は変更しない。
+                    - 自然な日本語表現を使用。
+                    - 技術用語の一貫性を保つ。
+                    - 外来語は適切なカタカナ表記に変換（例：demo → デモ）。
                     2. 形式要件：
-                    - 原文の形式を維持
-                    - 説明的な注釈を付けない
-                    3. 出力：翻訳テキストのみ
+                    - 原文のフォーマットを保持。
+                    - 注釈や説明を追加しない。
+                    3. 出力要件：
+                    - 翻訳されたテキストのみを提供し、それ以外の情報を含めない。
                     4. 特殊なケース：
-                    - 会社名や地名は公式の日本語名称を使用
-                    - 不明な略語はそのまま維持
-                    5. カタカナ変換規則：
-                    - demo → デモ
-                    - test → テスト
-                    - space → スペース
-                    - system → システム
-                    注意：英単語が含まれている場合は、適切な日本語カタカナ表記に変換してください。"""
+                    - 会社名や地名は公式の日本語表記を使用。
+                    - 不明な略語はそのまま維持。"""
             },
+
             "Japanese": {
-                "Chinese": """作为汽车行业专业翻译，请遵循以下规则：
+                "Chinese": """作为汽车行业的专业翻译，请严格遵循以下规则：
                     1. 翻译规则：
-                    - 保持缩写词和专有名词不变（如 IEM、BMW）
-                    - 使用专业的中文表达
-                    - 保持术语一致性
+                    - 保持缩写词和专有名词不变（如 IEM、BMW）。
+                    - 采用专业且正式的中文表达。
+                    - 确保技术术语的一致性。
                     2. 格式要求：
-                    - 保持原有格式
-                    - 不添加解释说明
-                    3. 输出：仅输出翻译文本
+                    - 维持原始格式。
+                    - 不添加解释、注释或额外内容。
+                    3. 输出要求：
+                    - 仅提供翻译文本，不包含其他信息。
                     4. 特殊情况：
-                    - 使用公司和地点的官方中文名称
-                    - 未知缩写保持原样""",
-                    
-                "English": """You are a professional automotive industry translator. Rules:
+                    - 公司和地名使用官方的中文名称。
+                    - 未知缩写保持原样。""",
+
+                "English": """You are a professional translator for the automotive industry. Follow these rules:
                     1. Translation Rules:
-                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW)
-                    - Maintain professional tone
-                    - Keep technical terms consistent
+                    - Keep acronyms and proper nouns unchanged (e.g., IEM, BMW).
+                    - Maintain a professional and technical tone.
+                    - Ensure consistency in technical terms.
                     2. Format Requirements:
-                    - Preserve original formatting
-                    - No explanatory notes
-                    3. Output: Translated text only
+                    - Preserve original formatting.
+                    - Do not add explanations, comments, or footnotes.
+                    3. Output Requirements:
+                    - Only provide the translated text without any additional information.
                     4. Special Cases:
-                    - Use official English names for companies and locations
-                    - Keep unknown acronyms unchanged"""
+                    - Use official English names for companies and locations.
+                    - Keep unknown acronyms unchanged."""
             }
         }
+
 
     def get_prompt(self, source_lang, target_lang):
         """获取特定语言对的提示词"""
