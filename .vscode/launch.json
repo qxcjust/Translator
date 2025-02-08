@@ -10,7 +10,7 @@
             "name": "Python: 翻译器",
             "type": "debugpy",
             "request": "launch",
-            "program": "cl_cline.py",
+            "program": "cl_interface.py",
             "args": [
                 ".\\Updatefile\\2025-02-05\\技术空间demo_20250121.pptx",
                 ".\\translateFiles\\2025-02-05\\技术空间demo_20250121_Japanese.pptx",

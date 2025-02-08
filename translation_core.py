@@ -2,6 +2,11 @@ from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import StrOutputParser
 import re
+import logging
+
+
+# 配置日志记录
+logging.basicConfig(level=logging.INFO)
 
 class TranslationCore:
     def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.0):
@@ -116,7 +121,9 @@ class TranslationCore:
     def preprocess_text(self, text):
         """预处理文本，保护特殊标记"""
         # 使用正则表达式找出并保护缩写词
-        protected_terms = {"IEM","TSAP"}
+        protected_terms = {}
+        protected_terms['IEM'] = "IEM"
+        protected_terms['TSAP'] = "TSAP"
         
         # 保护大写字母组成的缩写词
         acronyms = re.finditer(r'\b[A-Z]{2,}\b', text)
@@ -163,6 +170,6 @@ class TranslationCore:
         # 后处理文本
         final_text = self.postprocess_text(response, protected_terms)
         # 翻译前后结果，log输出
-        
+        logging.info(f"{text} → {processed_text} → {response} → {final_text} Translating from {source_lang} to {target_lang} ")        
 
         return final_text

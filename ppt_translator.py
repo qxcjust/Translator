@@ -223,14 +223,15 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                     # 更新进度
                                     current_work += len(run.text)
                                     progress = (current_work / total_work) * 100
-                                    task.update_state(
-                                        state='PROGRESS',
-                                        meta={
-                                            'current': current_work,
-                                            'total': total_work,
-                                            'progress': round(progress, 1)
-                                        }
-                                    )
+                                    if task is not None:
+                                        task.update_state(
+                                            state='PROGRESS',
+                                            meta={
+                                                'current': current_work,
+                                                'total': total_work,
+                                                'progress': round(progress, 1)
+                                            }
+                                        )
                         else:
                             if paragraph.text.strip():
                                 translated_text = translate_text_with_format(
@@ -240,14 +241,15 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                 # 更新进度
                                 current_work += len(paragraph.text)
                                 progress = (current_work / total_work) * 100
-                                task.update_state(
-                                    state='PROGRESS',
-                                    meta={
-                                        'current': current_work,
-                                        'total': total_work,
-                                        'progress': round(progress, 1)
-                                    }
-                                )
+                                if task is not None:
+                                    task.update_state(
+                                        state='PROGRESS',
+                                        meta={
+                                            'current': current_work,
+                                            'total': total_work,
+                                            'progress': round(progress, 1)
+                                        }
+                                    )
                         
                         paragraph_formats.append((alignment, runs_info))
                     
@@ -281,14 +283,15 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                                             # 更新进度
                                             current_work += len(run.text)
                                             progress = (current_work / total_work) * 100
-                                            task.update_state(
-                                                state='PROGRESS',
-                                                meta={
-                                                    'current': current_work,
-                                                    'total': total_work,
-                                                    'progress': round(progress, 1)
-                                                }
-                                            )
+                                            if task is not None:
+                                                task.update_state(
+                                                    state='PROGRESS',
+                                                    meta={
+                                                        'current': current_work,
+                                                        'total': total_work,
+                                                        'progress': round(progress, 1)
+                                                    }
+                                                )
                                     cell_formats.append((alignment, runs_info))
                                 
                                 # 应用翻译和格式
