@@ -257,7 +257,7 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                         combined_text = ""
                         format_infos = []
                         for run in paragraph.runs:
-                            if run.text.strip():
+                            if run.text:
                                 combined_text += run.text
                                 format_infos.append(get_text_format(run))
 
