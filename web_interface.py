@@ -200,5 +200,5 @@ def download():
     return send_from_directory(os.path.dirname(file_path), file_name, as_attachment=True)
 
 if __name__ == "__main__":
-    #app.run(host='0.0.0.0', port=5000, debug=True) #自动使用电脑IP
-    app.run(debug=True) #使用172.0.0.01
+    app.run(host='0.0.0.0', port=5000, debug=True) #自动使用电脑IP
+    #app.run(debug=True) #使用172.0.0.01
