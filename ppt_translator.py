@@ -215,161 +215,136 @@ def split_text_into_parts(text, num_parts, target_lang):
 
     return split_texts
 
+# ----------------------- 新增辅助函数 -----------------------
+def scan_shape(shape):
+    """
+    递归统计一个形状中所有文本的字符数（包括文本框、表格及组合形状内的子形状）
+    """
+    total = 0
+    if hasattr(shape, "has_text_frame") and shape.has_text_frame:
+        for paragraph in shape.text_frame.paragraphs:
+            if paragraph.runs:
+                for run in paragraph.runs:
+                    if run.text.strip():
+                        total += len(run.text)
+            else:
+                if paragraph.text.strip():
+                    total += len(paragraph.text)
+    if hasattr(shape, "has_table") and shape.has_table:
+        for row in shape.table.rows:
+            for cell in row.cells:
+                if cell.text.strip():
+                    total += len(cell.text)
+    # 若为组合形状，则递归扫描内部所有子形状
+    if hasattr(shape, "shapes"):
+        for sub_shape in shape.shapes:
+            total += scan_shape(sub_shape)
+    return total
+
+def process_text_frame(text_frame, container, translation_core, source_lang, target_lang, task, current_work, total_work):
+    """
+    对单个文本框（或单元格内的文本框）进行翻译，并保持格式。
+    container 参数用于传递原始形状，供计算字体大小时使用。
+    """
+    paragraph_formats = []
+    for paragraph in text_frame.paragraphs:
+        alignment = paragraph.alignment
+        runs_info = []
+        combined_text = ""
+        format_infos = []
+        for run in paragraph.runs:
+            if run.text:
+                combined_text += run.text
+                format_infos.append(get_text_format(run))
+        if combined_text.strip():
+            translated_text = translate_text_with_format(translation_core, combined_text, source_lang, target_lang)
+            split_texts = split_text_into_parts(translated_text, len(format_infos), target_lang)
+            runs_info.append((split_texts, format_infos))
+            # 更新进度
+            current_work[0] += len(combined_text)
+            progress = (current_work[0] / total_work) * 100
+            if task is not None:
+                task.update_state(
+                    state='PROGRESS',
+                    meta={
+                        'current': current_work[0],
+                        'total': total_work,
+                        'progress': round(progress, 1)
+                    }
+                )
+        paragraph_formats.append((alignment, runs_info))
+    
+    # 清空文本框内容，但保留原始的第一个段落以避免产生多余换行
+    while len(text_frame.paragraphs) > 1:
+        p = text_frame.paragraphs[-1]
+        p._element.getparent().remove(p._element)
+    first_paragraph = text_frame.paragraphs[0]
+    first_paragraph.text = ""
+    
+    # 应用翻译后的文本与格式
+    for idx, (alignment, runs_info) in enumerate(paragraph_formats):
+        if idx == 0:
+            paragraph = text_frame.paragraphs[0]
+        else:
+            paragraph = text_frame.add_paragraph()
+        if alignment is not None:
+            paragraph.alignment = alignment  # 保留原始对齐方式
+            if runs_info and len(runs_info) > 0 and hasattr(paragraph, 'margin_left'):
+                paragraph.margin_left = runs_info[0][1][0].margin_left
+        for split_texts, format_infos in runs_info:
+            for split_text, format_info in zip(split_texts, format_infos):
+                run = paragraph.add_run()
+                run.text = split_text  # 填入翻译后的文本
+                apply_text_format(run, format_info, container, split_text)
+
+def process_table(table, translation_core, source_lang, target_lang, task, current_work, total_work):
+    """
+    处理表格中的每个单元格（cell）的文本框翻译
+    """
+    for row in table.rows:
+        for cell in row.cells:
+            if cell.text.strip():
+                process_text_frame(cell.text_frame, cell.text_frame, translation_core, source_lang, target_lang, task, current_work, total_work)
+
+def process_shape(shape, translation_core, source_lang, target_lang, task, current_work, total_work):
+    """
+    递归处理单个形状：
+      - 如果形状含文本框，进行翻译
+      - 如果形状为表格，处理其中所有单元格
+      - 如果形状为组合形状，递归处理其所有子形状
+    """
+    if hasattr(shape, "has_text_frame") and shape.has_text_frame:
+        process_text_frame(shape.text_frame, shape, translation_core, source_lang, target_lang, task, current_work, total_work)
+    elif hasattr(shape, "has_table") and shape.has_table:
+        process_table(shape.table, translation_core, source_lang, target_lang, task, current_work, total_work)
+    # 若为组合形状，递归处理其内部子形状
+    if hasattr(shape, "shapes"):
+        for sub_shape in shape.shapes:
+            process_shape(sub_shape, translation_core, source_lang, target_lang, task, current_work, total_work)
+
+# ----------------------- 主函数 -----------------------
 def translate_powerpoint(translation_core, file_path, output_path, source_lang, target_lang, task):
-    """翻译PowerPoint文件并保持格式"""
+    """翻译PowerPoint文件并保持格式，包括对组合形状的支持"""
     logging.info(f"开始翻译PowerPoint文件: {file_path}")
     try:
         prs = Presentation(file_path)
         
-        # 计算总工作量
+        # 预扫描所有需要翻译的内容（包括组合形状内的文本）
         total_work = 0
-        current_work = 0
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                total_work += scan_shape(shape)
         
-        # 预扫描所有需要翻译的内容
+        current_work = [0]  # 使用列表保存进度，便于在子函数中更新
+        
+        # 递归处理每个幻灯片中的所有形状
         for slide in prs.slides:
             for shape in slide.shapes:
-                if shape.has_text_frame:
-                    for paragraph in shape.text_frame.paragraphs:
-                        if len(paragraph.runs) > 0:
-                            for run in paragraph.runs:
-                                if run.text.strip():
-                                    total_work += len(run.text)
-                        else:
-                            if paragraph.text.strip():
-                                total_work += len(paragraph.text)
-                elif shape.has_table:
-                    for row in shape.table.rows:
-                        for cell in row.cells:
-                            if cell.text.strip():
-                                total_work += len(cell.text)
-
-        for slide in prs.slides:
-            for shape in slide.shapes:
-                # 处理文本框
-                if shape.has_text_frame:
-                    text_frame = shape.text_frame
-                    paragraph_formats = []
-                    for paragraph in text_frame.paragraphs:
-                        alignment = paragraph.alignment
-                        runs_info = []
-                        # 合并所有 run 的文本并记录格式信息
-                        combined_text = ""
-                        format_infos = []
-                        for run in paragraph.runs:
-                            if run.text:
-                                combined_text += run.text
-                                format_infos.append(get_text_format(run))
-                        if combined_text.strip():
-                            translated_text = translate_text_with_format(
-                                translation_core, combined_text, source_lang, target_lang
-                            )
-                            
-                            # 将翻译后的文本按原始 run 数量拆分
-                            split_texts = split_text_into_parts(translated_text, len(format_infos), target_lang)
-                            runs_info.append((split_texts, format_infos))
-                            # 更新进度
-                            current_work += len(combined_text)
-                            progress = (current_work / total_work) * 100
-                            if task is not None:
-                                task.update_state(
-                                    state='PROGRESS',
-                                    meta={
-                                        'current': current_work,
-                                        'total': total_work,
-                                        'progress': round(progress, 1)
-                                    }
-                                )
-
-                        paragraph_formats.append((alignment, runs_info))
-                    
-                    # 清空文本框内容，但保留原始的第一个段落，避免多余换行
-                    while len(text_frame.paragraphs) > 1:
-                        p = text_frame.paragraphs[-1]
-                        p._element.getparent().remove(p._element)
-                    first_paragraph = text_frame.paragraphs[0]
-                    first_paragraph.text = ""  # 直接清空文本即可
-                    
-                    # 应用翻译和格式
-                    for idx, (alignment, runs_info) in enumerate(paragraph_formats):
-                        if idx == 0:
-                            paragraph = text_frame.paragraphs[0]
-                        else:
-                            paragraph = text_frame.add_paragraph()
-                        if alignment is not None:
-                            paragraph.alignment = alignment  # 确保保留原始对齐方式
-                        if runs_info and len(runs_info) > 0 and hasattr(paragraph, 'margin_left'):
-                            paragraph.margin_left = runs_info[0][1][0].margin_left
-                        for split_texts, format_infos in runs_info:
-                            for split_text, format_info in zip(split_texts, format_infos):
-                                run = paragraph.add_run()
-                                run.text = split_text  # 将翻译后的文本填入原有 run
-                                apply_text_format(run, format_info, shape, split_text)
-
-                # 处理表格
-                elif shape.has_table:
-                    for row in shape.table.rows:
-                        for cell in row.cells:
-                            if cell.text.strip():
-                                cell_formats = []
-                                for paragraph in cell.text_frame.paragraphs:
-                                    alignment = paragraph.alignment
-                                    runs_info = []
-                                    combined_text = ""
-                                    format_infos = []
-                                    for run in paragraph.runs:
-                                        if run.text.strip():
-                                            combined_text += run.text
-                                            format_infos.append(get_text_format(run))
-                                    if combined_text.strip():
-                                        translated_text = translate_text_with_format(
-                                            translation_core, combined_text, source_lang, target_lang
-                                        )
-                                                                                
-                                        # 将翻译后的文本按原始 run 数量拆分
-                                        split_texts = split_text_into_parts(translated_text, len(format_infos), target_lang)
-                                        runs_info.append((split_texts, format_infos))
-                                        # 更新进度
-                                        current_work += len(combined_text)
-                                        progress = (current_work / total_work) * 100
-                                        if task is not None:
-                                            task.update_state(
-                                                state='PROGRESS',
-                                                meta={
-                                                    'current': current_work,
-                                                    'total': total_work,
-                                                    'progress': round(progress, 1)
-                                                }
-                                            )
-
-                                    cell_formats.append((alignment, runs_info))
-                                
-                                # 清空单元格文本框内容，但保留原始的第一个段落，避免多余换行
-                                while len(cell.text_frame.paragraphs) > 1:
-                                    p = cell.text_frame.paragraphs[-1]
-                                    p._element.getparent().remove(p._element)
-                                first_paragraph = cell.text_frame.paragraphs[0]
-                                first_paragraph.text = ""  # 直接清空文本
-                                
-                                # 应用翻译和格式到单元格
-                                for idx, (alignment, runs_info) in enumerate(cell_formats):
-                                    if idx == 0:
-                                        paragraph = cell.text_frame.paragraphs[0]
-                                    else:
-                                        paragraph = cell.text_frame.add_paragraph()
-                                    if alignment is not None:
-                                        paragraph.alignment = alignment  # 确保保留原始对齐方式
-                                    if runs_info and len(runs_info) > 0 and hasattr(paragraph, 'margin_left'):
-                                        paragraph.margin_left = runs_info[0][1][0].margin_left
-                                    for split_texts, format_infos in runs_info:
-                                        for split_text, format_info in zip(split_texts, format_infos):
-                                            run = paragraph.add_run()
-                                            run.text = split_text
-                                            apply_text_format(run, format_info, cell.text_frame, split_text)
-
-        # 保存翻译后的文件
+                process_shape(shape, translation_core, source_lang, target_lang, task, current_work, total_work)
+        
         prs.save(output_path)
         logging.info(f"PowerPoint文件翻译完成: {output_path}")
-
+        
     except Exception as e:
         logging.error(f"翻译文件时出错 {file_path}: {str(e)}")
         logging.error(traceback.format_exc())
