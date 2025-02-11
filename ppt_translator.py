@@ -11,12 +11,12 @@ import re
 logging.basicConfig(level=logging.INFO)
 
 class TextFormat:
-    """存储文本格式信息的类"""
+    """Store text format information"""
     def __init__(self, font_name=None, font_size=None, font_bold=None, 
                  font_italic=None, font_underline=None, color=None, 
                  alignment=None, spacing=None, margin_left=None, margin_right=None):
         self.font_name = font_name
-        self.font_size = font_size  # 单位 pt
+        self.font_size = font_size  # in pt
         self.font_bold = font_bold
         self.font_italic = font_italic
         self.font_underline = font_underline
@@ -27,7 +27,7 @@ class TextFormat:
         self.margin_right = margin_right
 
 def split_text(text, max_length=4096):
-    """将长文本分割成更小的块"""
+    """Split long text into smaller chunks"""
     if len(text) <= max_length:
         return [text]
     
@@ -50,8 +50,8 @@ def split_text(text, max_length=4096):
 
 def calculate_font_size(shape, text, original_size):
     """
-    根据形状尺寸（转换为 pt 单位）和文本总长度，估算合适的字体大小（只向下调整）。
-    仅作为局部调整的参考，后续统一调整字体大小时采用后处理方案。
+    Estimate an appropriate font size based on the shape dimensions (converted to pt) and the total length of the text.
+    Only used as a reference for local adjustments; a unified font size adjustment will be applied later.
     """
     try:
         if not shape.width or not shape.height:
@@ -72,11 +72,11 @@ def calculate_font_size(shape, text, original_size):
             return max(8, new_size)
         return original_size
     except Exception as e:
-        logging.warning(f"计算字体大小时出错: {e}")
+        logging.warning(f"Error calculating font size: {e}")
         return original_size
 
 def get_text_format(run, shape=None):
-    """获取文本运行的格式信息"""
+    """Get format information for a text run"""
     try:
         font = run.font
         format_info = TextFormat(
@@ -99,11 +99,11 @@ def get_text_format(run, shape=None):
                 format_info.margin_right = paragraph.margin_right
         return format_info
     except Exception as e:
-        logging.warning(f"获取格式信息时出错: {e}")
+        logging.warning(f"Error getting format information: {e}")
         return TextFormat()
 
 def apply_text_format(run, format_info, shape=None, text=None):
-    """应用文本格式到 run"""
+    """Apply text format to run"""
     try:
         if format_info.font_name:
             run.font.name = format_info.font_name
@@ -128,10 +128,10 @@ def apply_text_format(run, format_info, shape=None, text=None):
             if format_info.margin_right is not None:
                 paragraph.margin_right = format_info.margin_right
     except Exception as e:
-        logging.warning(f"应用格式时出错: {e}")
+        logging.warning(f"Error applying format: {e}")
 
 def translate_text_with_format(translation_core, text, source_lang, target_lang):
-    """翻译文本并处理长文本"""
+    """Translate text and handle long text"""
     if not text.strip():
         return ""
     text_chunks = split_text(text)
@@ -171,10 +171,10 @@ def split_text_into_parts(text, num_parts, target_lang):
             start = end
     return split_texts
 
-# ----------------------- 组合形状处理辅助函数 -----------------------
+# ----------------------- Helper functions for grouped shapes -----------------------
 def scan_shape(shape):
     """
-    递归统计形状中所有文本的字符数（包括文本框、表格及组合形状内的子形状）
+    Recursively count the number of characters in all text within the shape (including text frames, tables, and sub-shapes within grouped shapes)
     """
     total = 0
     if hasattr(shape, "has_text_frame") and shape.has_text_frame:
@@ -198,8 +198,8 @@ def scan_shape(shape):
 
 def process_text_frame(text_frame, container, translation_core, source_lang, target_lang, task, current_work, total_work):
     """
-    对单个文本框（或单元格内的文本框）进行翻译，并保持格式。
-    container 参数用于传递原始形状或单元格，供计算字体大小时使用。
+    Translate a single text frame (or text frame within a cell) and maintain the format.
+    The container parameter is used to pass the original shape or cell for font size calculations.
     """
     paragraph_formats = []
     for paragraph in text_frame.paragraphs:
@@ -228,14 +228,14 @@ def process_text_frame(text_frame, container, translation_core, source_lang, tar
                 )
         paragraph_formats.append((alignment, runs_info))
     
-    # 清空文本框内容，但保留第一个段落，避免产生多余换行
+    # Clear the text frame content, but retain the first paragraph to avoid extra line breaks
     while len(text_frame.paragraphs) > 1:
         p = text_frame.paragraphs[-1]
         p._element.getparent().remove(p._element)
     first_paragraph = text_frame.paragraphs[0]
     first_paragraph.text = ""
     
-    # 应用翻译后的文本与格式（保持原 run 分割，不在此处统一调整字体大小）
+    # Apply translated text and format (keep original run divisions, do not adjust font size here)
     for idx, (alignment, runs_info) in enumerate(paragraph_formats):
         if idx == 0:
             paragraph = text_frame.paragraphs[0]
@@ -253,8 +253,8 @@ def process_text_frame(text_frame, container, translation_core, source_lang, tar
 
 def process_table(table, translation_core, source_lang, target_lang, task, current_work, total_work):
     """
-    处理表格中每个单元格的文本翻译
-    注意：容器参数改为 cell 而非 cell.text_frame
+    Process the text in each cell of the table
+    Note: The container parameter is changed from cell.text_frame to cell
     """
     for row in table.rows:
         for cell in row.cells:
@@ -263,10 +263,10 @@ def process_table(table, translation_core, source_lang, target_lang, task, curre
 
 def process_shape(shape, translation_core, source_lang, target_lang, task, current_work, total_work):
     """
-    递归处理单个形状：
-      - 若形状具有文本框，则翻译其中的文字；
-      - 若形状为表格，则处理所有单元格；
-      - 若为组合形状，则递归处理其所有子形状。
+    Recursively process a single shape:
+      - If the shape has a text frame, translate the text within it;
+      - If the shape is a table, process all cells;
+      - If it is a grouped shape, recursively process all sub-shapes.
     """
     if hasattr(shape, "has_text_frame") and shape.has_text_frame:
         process_text_frame(shape.text_frame, shape, translation_core, source_lang, target_lang, task, current_work, total_work)
@@ -276,13 +276,13 @@ def process_shape(shape, translation_core, source_lang, target_lang, task, curre
         for sub_shape in shape.shapes:
             process_shape(sub_shape, translation_core, source_lang, target_lang, task, current_work, total_work)
 
-# ----------------------- 后处理：统一调整字体大小 -----------------------
+# ----------------------- Post-processing: Unified font size adjustment -----------------------
 def adjust_text_frame_font_size(text_frame, container):
     """
-    对单个文本框进行后处理：估算该文本框内所有文字在当前字体下所需的高度，
-    如果超出容器高度，则计算统一缩放因子并按比例缩小所有 run 的字体大小，
-    保证翻译后的文字全部显示在容器内。若不超出，则保持原样。
-    这里 container 应该是具有 width、height 属性的对象（如 Shape 或 Table Cell）。
+    Post-process a single text frame: estimate the total height required for all text in the text frame at the current font size,
+    if it exceeds the container height, calculate a uniform scaling factor and proportionally reduce the font size of all runs,
+    ensuring that the translated text fits within the container. If it does not exceed, keep the original size.
+    Here, container should be an object with width and height attributes (such as Shape or Table Cell).
     """
     total_text = ""
     font_sizes = []
@@ -321,16 +321,16 @@ def adjust_text_frame_font_size(text_frame, container):
                 if run.text.strip():
                     current_size = run.font.size.pt if run.font.size else 12
                     new_size = current_size * scaling_factor
-                    new_size = max(new_size, 8)  # 确保不低于8pt
+                    new_size = max(new_size, 8)  # Ensure no less than 8pt
                     run.font.size = Pt(new_size)
 
 def adjust_shape_font_size(shape):
     """
-    对单个形状进行后处理：
-      - 如果形状有文本框，则调整其字体大小；
-      - 如果为表格，则对所有单元格执行调整；
-      - 如果为组合形状，则递归处理其所有子形状。
-    为避免出现 container 为 TextFrame 的情况，这里先检查 shape 是否具有 width 属性。
+    Post-process a single shape:
+      - If the shape has a text frame, adjust its font size;
+      - If it is a table, adjust all cells;
+      - If it is a grouped shape, recursively process all sub-shapes.
+    To avoid the case where container is TextFrame, check if shape has width attribute first.
     """
     if not (hasattr(shape, 'width') and hasattr(shape, 'height')):
         return
@@ -345,20 +345,20 @@ def adjust_shape_font_size(shape):
             adjust_shape_font_size(sub_shape)
 
 def adjust_font_size_for_all_shapes(prs):
-    """遍历所有幻灯片的所有形状，对含文本的形状统一调整字体大小"""
+    """Traverse all shapes in all slides and uniformly adjust the font size for text-containing shapes"""
     for slide in prs.slides:
         for shape in slide.shapes:
             adjust_shape_font_size(shape)
 
-# ----------------------- 主函数 -----------------------
+# ----------------------- Main function -----------------------
 def translate_powerpoint(translation_core, file_path, output_path, source_lang, target_lang, task):
     """
-    翻译 PowerPoint 文件并保持格式（支持组合形状）。
-    先按原逻辑翻译并应用格式，然后在保存前统一后处理：
-      如果翻译后的文字已完全显示在容器内，则不调整；
-      如果超出，则统一缩小字体大小，使得所有文字能显示在容器内。
+    Translate a PowerPoint file and maintain the format (supports grouped shapes).
+    First, translate and apply formats according to the original logic, then uniformly adjust font sizes before saving:
+      If the translated text is completely displayed within the container, do not adjust;
+      If it exceeds, uniformly reduce the font size so that all text can be displayed within the container.
     """
-    logging.info(f"开始翻译PowerPoint文件: {file_path}")
+    logging.info(f"Start translating PowerPoint file: {file_path}")
     try:
         prs = Presentation(file_path)
         total_work = 0
@@ -371,9 +371,9 @@ def translate_powerpoint(translation_core, file_path, output_path, source_lang, 
                 process_shape(shape, translation_core, source_lang, target_lang, task, current_work, total_work)
         adjust_font_size_for_all_shapes(prs)
         prs.save(output_path)
-        logging.info(f"PowerPoint文件翻译完成: {output_path}")
+        logging.info(f"PowerPoint file translation completed: {output_path}")
     except Exception as e:
-        logging.error(f"翻译文件时出错 {file_path}: {e}")
+        logging.error(f"Error translating file {file_path}: {e}")
         logging.error(traceback.format_exc())
         if task is not None:
             task.update_state(

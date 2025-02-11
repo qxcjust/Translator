@@ -10,10 +10,10 @@ logging.basicConfig(level=logging.INFO)
 
 class TranslationCore:
     def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.2):
-        # 初始化模型
+        # Initialize model
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
         
-        # 使用目标语言编写提示词
+        # Write prompts in target language
         self.language_prompts = {
             "Chinese": {
                 "English": """You are a professional translator for the automotive industry. Follow these rules:
@@ -133,21 +133,20 @@ class TranslationCore:
             }
         }
 
-
     def get_prompt(self, source_lang, target_lang):
-        """获取特定语言对的提示词"""
+        """Get the prompt for a specific language pair"""
         if source_lang in self.language_prompts and target_lang in self.language_prompts[source_lang]:
             return self.language_prompts[source_lang][target_lang]
         return None
 
     def preprocess_text(self, text):
-        """预处理文本，保护特殊标记"""
-        # 使用正则表达式找出并保护缩写词
+        """Preprocess text to protect special markers"""
+        # Use regular expressions to find and protect acronyms
         protected_terms = {}
         protected_terms['IEM'] = "IEM"
         protected_terms['TSAP'] = "TSAP"
         
-        # 保护大写字母组成的缩写词
+        # Protect acronyms composed of uppercase letters
         acronyms = re.finditer(r'\b[A-Z]{2,}\b', text)
         for i, match in enumerate(acronyms):
             key = f"__ACRONYM_{i}__"
@@ -157,41 +156,41 @@ class TranslationCore:
         return text, protected_terms
 
     def postprocess_text(self, text, protected_terms):
-        """后处理文本，恢复特殊标记"""
+        """Postprocess text to restore special markers"""
         for key, value in protected_terms.items():
             text = text.replace(key, value)
         return text
 
     def translate_text(self, text, source_lang, target_lang):
-        """翻译文本"""
+        """Translate text"""
         if re.match(r'^\s*$', text):
             return ""
         elif re.match(r'^[a-zA-Z0-9]+$', text):
             return text
             
-        # 预处理文本
+        # Preprocess text
         processed_text, protected_terms = self.preprocess_text(text)
         
-        # 获取特定语言对的提示词
+        # Get the prompt for the specific language pair
         system_prompt = self.get_prompt(source_lang, target_lang)
         if not system_prompt:
             raise ValueError(f"Unsupported language pair: {source_lang} to {target_lang}")
 
-        # 创建特定语言对の提示模板
+        # Create a prompt template for the specific language pair
         prompt = ChatPromptTemplate([
             ("system", system_prompt),
             ("user", "{input}")
         ])
         
-        # 构建翻译链
+        # Build the translation chain
         chain = prompt | self.llm | StrOutputParser()
         
-        # 执行翻译
+        # Execute translation
         response = chain.invoke({"input": processed_text})
         
-        # 后处理文本
+        # Postprocess text
         final_text = self.postprocess_text(response, protected_terms)
-        # 翻译前后结果，log输出
+        # Log the translation process
         logging.info(f"{text} → {processed_text} → {response} → {final_text} Translating from {source_lang} to {target_lang} ")        
 
         return final_text
