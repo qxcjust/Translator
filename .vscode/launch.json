@@ -12,8 +12,8 @@
             "request": "launch",
             "program": "cl_interface.py",
             "args": [
-                ".\\Updatefile\\2025-02-05\\技术空间demo_20250121.pptx",
-                ".\\translateFiles\\2025-02-05\\技术空间demo_20250121_Japanese.pptx",
+                ".\\Updatefile\\2025-02-12\\25年年度SDV预研申请清单-简易.xlsx",
+                ".\\translateFiles\\2025-02-12\\25年年度SDV预研申请清单-简易_Japanese.xlsx",
                 "Chinese",
                 "Japanese"
             ],
