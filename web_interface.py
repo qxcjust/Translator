@@ -60,6 +60,7 @@ def upload_file():
         
         # 获取文件大小
         file_size = get_file_size(file_path)
+        page_size = get_file_pages(file_path)
         
         # 获取文件MIME类型
         file_mime_type = file.content_type
@@ -83,7 +84,7 @@ def upload_file():
             "file_name": file.filename,
             "file_type": file_type,
             "file_size": file_size,
-            "file_pages": get_file_pages(file_path)
+            "file_pages": page_size
         }), 200
 
 # 假设有一个全局字典来存储任务状态

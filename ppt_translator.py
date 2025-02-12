@@ -10,7 +10,7 @@ import re
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
 
-class TextFormat:
+class pptTextFormat:
     """Store text format information"""
     def __init__(self, font_name=None, font_size=None, font_bold=None, 
                  font_italic=None, font_underline=None, color=None, 
@@ -79,7 +79,7 @@ def get_text_format(run, shape=None):
     """Get format information for a text run"""
     try:
         font = run.font
-        format_info = TextFormat(
+        format_info = pptTextFormat(
             font_name=font.name,
             font_size=font.size.pt if font.size else None,
             font_bold=font.bold,
@@ -100,7 +100,7 @@ def get_text_format(run, shape=None):
         return format_info
     except Exception as e:
         logging.warning(f"Error getting format information: {e}")
-        return TextFormat()
+        return pptTextFormat()
 
 def apply_text_format(run, format_info, shape=None, text=None):
     """Apply text format to run"""
