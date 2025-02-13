@@ -29,21 +29,44 @@ def translate_excel(translation_core, file_path, output_path, source_lang, targe
         for merged_range in original_sheet.merged_cells.ranges:
             translated_sheet.merge_cells(str(merged_range))
         
+        # 计算当前Sheet的总单元格数
+        total_cells = original_sheet.max_row * original_sheet.max_column
+        
         # 翻译单元格内容并复制格式
-        for row in original_sheet.iter_rows():
-            for cell in row:
+        for row_idx, row in enumerate(original_sheet.iter_rows(), 1):
+            for cell_idx, cell in enumerate(row, 1):
                 translated_value = _translate_cell_value(cell, translation_core, source_lang, target_lang)
                 translated_cell = translated_sheet.cell(row=cell.row, column=cell.column, value=translated_value)
                 _copy_cell_style(cell, translated_cell)
+                
+                # 更新单元格翻译进度
+                cell_progress = ((row_idx - 1) * original_sheet.max_column + cell_idx) / total_cells * 100
+                if task is not None:
+                    task.update_state(
+                        state='PROGRESS',
+                        meta={
+                            'current': sheet_idx,
+                            'total': total_sheets,
+                            'cell_progress': cell_progress,
+                            'sheet_progress': (sheet_idx - 1) / total_sheets * 100,
+                            'progress': ((sheet_idx - 1) + cell_progress / 100) / total_sheets * 100
+                        }
+                    )
         
         # 更新任务进度
-        progress = (sheet_idx / total_sheets) * 100
+        sheet_progress = (sheet_idx / total_sheets) * 100
         if task is not None:
             task.update_state(
                 state='PROGRESS',
-                meta={'current': sheet_idx, 'total': total_sheets, 'progress': progress}
+                meta={
+                    'current': sheet_idx,
+                    'total': total_sheets,
+                    'cell_progress': 100,
+                    'sheet_progress': sheet_progress,
+                    'progress': sheet_progress
+                }
             )
-        logging.info(f"Progress: {progress:.1f}% - Translated sheet '{sheet_name}'")
+        logging.info(f"Progress: {sheet_progress:.1f}% - Translated sheet '{sheet_name}'")
 
     # 保存翻译后的工作簿
     translated_wb.save(output_path)

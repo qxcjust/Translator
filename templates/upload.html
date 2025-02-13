@@ -134,7 +134,8 @@
                 xhr.open('POST', '/upload', true);
                 xhr.upload.onprogress = function(event) {
                     if (event.lengthComputable) {
-                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        let percentComplete = Math.round((event.loaded / event.total) * 100);
+                        percentComplete = Math.min(percentComplete, 100); 
                         document.getElementById('upload-progress').textContent = `${percentComplete}%`;
                     }
                 };
@@ -189,7 +190,7 @@
         // 添加开始翻译按钮的点击事件
         document.getElementById('start-translation-btn').addEventListener('click', function() {
             const fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length === 0 || !window.uploadedFileInfo || !window.uploadedFileInfo.file_path ) {
+            if (!window.uploadedFileInfo || !window.uploadedFileInfo.file_path ) {
                 alert('请先上传文件');
                 return;
             }
@@ -268,6 +269,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.state === 'PROGRESS') {
+                        const progress = Math.min(data.progress, 100);
                         document.getElementById(`translation-progress-${taskId}`).textContent = `${data.progress}%`;
                     } else if (data.state === 'SUCCESS') {
                         document.getElementById(`translation-progress-${taskId}`).textContent = '100%';
