@@ -1,6 +1,4 @@
 import logging
-from file_parsers import parse_word
-from format_preserver import save_translated_word
 from translation_core import TranslationCore
 from ppt_translator import translate_powerpoint
 from excel_translator import translate_excel
@@ -11,21 +9,6 @@ logging.basicConfig(level=logging.INFO)
 class FileTranslator:
     def __init__(self):
         self.translation_core = TranslationCore(endpoint_url="http://192.168.146.137:11434/v1")
-
-    def translate_word(self, file_path, output_path, source_lang, target_lang, task):
-        logging.info(f"Starting translation of Word file: {file_path}")
-        doc = parse_word(file_path)
-        total_paragraphs = len(doc.paragraphs)
-        for i, paragraph in enumerate(doc.paragraphs):
-            paragraph.text = self.translation_core.translate_text(paragraph.text, source_lang, target_lang)
-            task.update_state(state='PROGRESS', meta={'current': i + 1, 'total': total_paragraphs, 'progress': ((i + 1) / total_paragraphs) * 100.0})
-        for table in doc.tables:
-            for row in table.rows:
-                for cell in row.cells:
-                    cell.text = self.translation_core.translate_text(cell.text, source_lang, target_lang)
-        save_translated_word(doc, output_path)
-        logging.info(f"Completed translation of Word file: {file_path}")
-
     def translate_file(self, file_path, output_path, source_lang, target_lang, task):
         logging.info(f"Starting translation of file: {file_path}")
         if file_path.endswith('.xlsx') or file_path.endswith('.xls'):

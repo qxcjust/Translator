@@ -1,19 +1,11 @@
 import pandas as pd
 from pptx import Presentation
-from openpyxl import load_workbook
 from docx import Document  # 现在会指向正确的 python-docx 包
 import os
 import logging
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
-
-def parse_excel(file_path):
-    return pd.read_excel(file_path)
-
-def parse_word(file_path):
-    return Document(file_path)
-
 # 新增函数：获取文件页数
 def get_file_pages(file_path):
     #自动识别file_type
