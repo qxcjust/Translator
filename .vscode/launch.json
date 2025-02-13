@@ -12,8 +12,8 @@
             "request": "launch",
             "program": "cl_interface.py",
             "args": [
-                ".\\Updatefile\\2025-02-12\\25年年度SDV预研申请清单-简易.xlsx",
-                ".\\translateFiles\\2025-02-12\\25年年度SDV预研申请清单-简易_Japanese.xlsx",
+                ".\\Updatefile\\2025-02-13\\20240729_基于车载智脑及区域网关的汽车数字化架构研究组织实施协议_iAutoUpdated20241022(1).docx",
+                ".\\translateFiles\\2025-02-13\\20240729_基于车载智脑及区域网关的汽车数字化架构研究组织实施协议_iAutoUpdated20241022(1)_Japanese.docx",
                 "Chinese",
                 "Japanese"
             ],

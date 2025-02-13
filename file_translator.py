@@ -4,6 +4,7 @@ from format_preserver import save_translated_word
 from translation_core import TranslationCore
 from ppt_translator import translate_powerpoint
 from excel_translator import translate_excel
+from word_translator import translate_word
 
 logging.basicConfig(level=logging.INFO)
 
@@ -36,7 +37,7 @@ class FileTranslator:
             if task is not None:
                 task.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         elif file_path.endswith('.docx'):
-            self.translate_word(file_path, output_path, source_lang, target_lang, task)
+            translate_word(self.translation_core, file_path, output_path, source_lang, target_lang, task)
             if task is not None:
                 task.update_state(state='SUCCESS', meta={'translated_file_path': output_path})
         else:
