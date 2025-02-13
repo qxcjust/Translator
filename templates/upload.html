@@ -180,7 +180,7 @@
                 <td id="translation-progress-${fileInfo.task_id}">0%</td>
                 <td>${fileInfo.start_time}</td>
                 <td id="download-btn-${fileInfo.task_id}" style="display:none;">
-                    <button onclick="downloadTranslatedFile('${fileInfo.translated_file_path}')">下载</button>
+                    <button id="download-btn-inner-${fileInfo.task_id}">Download</button>
                 </td>
             `;
             document.getElementById('translation-status-table-body').appendChild(newRow);
