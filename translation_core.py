@@ -13,6 +13,8 @@ class TranslationCore:
     def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.2):
         # Initialize model
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
+        # 创建 AcronymManager 实例
+        self.acronym_manager = AcronymManager()
         
         # Write prompts in target language
         self.language_prompts = {
@@ -142,7 +144,7 @@ class TranslationCore:
 
     def preprocess_text(self, text):
         """Preprocess text to protect special markers"""
-        protected_terms = AcronymManager.protected_terms
+        protected_terms = self.acronym_manager.protected_terms
         # Protect acronyms composed of uppercase letters
         acronyms = re.finditer(r'\b[A-Z]{2,}\b', text)
         for i, match in enumerate(acronyms):
