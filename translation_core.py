@@ -5,7 +5,6 @@ import re
 import logging
 from acronym_manager import AcronymManager
 
-
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
 
@@ -146,7 +145,7 @@ class TranslationCore:
         """Preprocess text to protect special markers"""
         protected_terms = self.acronym_manager.protected_terms
         # Protect acronyms composed of uppercase letters
-        acronyms = re.finditer(r'\b[A-Z]{2,}\b', text)
+        acronyms = re.finditer(r'\b[a-zA-Z0-9]+\b', text)
         for i, match in enumerate(acronyms):
             key = f"__ACRONYM_{i}__"
             protected_terms[key] = match.group()
@@ -163,21 +162,22 @@ class TranslationCore:
 
     def postprocess_text(self, text, protected_terms):
         """Postprocess text to restore special markers"""
-        for key, value in protected_terms.items():
+        # Ensure the order of restoration is correct
+        for key, value in reversed(list(protected_terms.items())):
             text = text.replace(key, value)
         return text
 
     def translate_text(self, text, source_lang, target_lang):
         """Translate text"""
-        if not text:
-            return ""
-        elif text.strip() == "":
+        if not text or text.strip() == "":
+            return ""  # 直接返回空字符串，不进行翻译处理
+        
+        # 匹配英文，中文，日文字母、数字、空格、标点符号、括号和连字符，以及箭头符号
+        alphanumeric_chars = self.acronym_manager.alphanumeric_chars
+        special_chars = self.acronym_manager.special_characters
+        if re.match(rf'^[{alphanumeric_chars}{special_chars}]*$', text):  
             return text
-        elif re.match(r'^\s*$', text):
-            return ""
-        elif re.match(r'^[a-zA-Z0-9]+$', text):
-            return text
-            
+    
         # Preprocess text
         processed_text, protected_terms = self.preprocess_text(text)
         
