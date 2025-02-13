@@ -187,11 +187,13 @@ def task_status(task_id):
 @app.route('/download', methods=['GET'])
 def download():
     file_path = request.args.get('file_path')
-    if not file_path:
-        return jsonify({"error": "No file path provided"}), 400
+    if not file_path or file_path == 'null':
+        logging.error("No file path provided or file path is null")
+        return jsonify({"error": "No file path provided or file path is invalid"}), 400
     
     # 检查文件是否存在
     if not os.path.exists(file_path):
+        logging.error(f"File not found: {file_path}")
         return jsonify({"error": "File not found"}), 404
     
     # 提取文件名
