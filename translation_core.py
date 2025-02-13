@@ -3,6 +3,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema import StrOutputParser
 import re
 import logging
+from acronym_manager import AcronymManager
 
 
 # 配置日志记录
@@ -141,11 +142,7 @@ class TranslationCore:
 
     def preprocess_text(self, text):
         """Preprocess text to protect special markers"""
-        # Use regular expressions to find and protect acronyms
-        protected_terms = {}
-        protected_terms['IEM'] = "IEM"
-        protected_terms['TSAP'] = "TSAP"
-        
+        protected_terms = AcronymManager.protected_terms
         # Protect acronyms composed of uppercase letters
         acronyms = re.finditer(r'\b[A-Z]{2,}\b', text)
         for i, match in enumerate(acronyms):
@@ -153,6 +150,13 @@ class TranslationCore:
             protected_terms[key] = match.group()
             text = text.replace(match.group(), key)
         
+        # 保护箭头符号
+        arrows = re.finditer(r'[↑↓←→↗↙]', text)
+        for i, match in enumerate(arrows):
+            key = f"__ARROW_{i}__"
+            protected_terms[key] = match.group()
+            text = text.replace(match.group(), key)
+            
         return text, protected_terms
 
     def postprocess_text(self, text, protected_terms):
@@ -163,7 +167,11 @@ class TranslationCore:
 
     def translate_text(self, text, source_lang, target_lang):
         """Translate text"""
-        if re.match(r'^\s*$', text):
+        if not text:
+            return ""
+        elif text.strip() == "":
+            return text
+        elif re.match(r'^\s*$', text):
             return ""
         elif re.match(r'^[a-zA-Z0-9]+$', text):
             return text
