@@ -303,9 +303,7 @@ def adjust_text_frame_font_size(text_frame, container):
                 total_text += run_text
                 
                 # 获取当前run的字号（没有设置时使用默认12pt）
-                run_size = 12.0  # 默认值
-                if run.font.size and run.font.size.pt:
-                    run_size = run.font.size.pt
+                run_size = run.font.size.pt if run.font.size else 12.0  # 修改为翻译前的字体大小
                 sum_font_size += run_size * char_count  # 加权计算
 
     # 计算加权平均字号
@@ -321,7 +319,7 @@ def adjust_text_frame_font_size(text_frame, container):
         return
 
     # 字符宽度估算（根据实际测试调整系数）
-    avg_char_width = avg_font_size * 0.6  # 原1.2改为0.6更符合实际
+    avg_char_width = avg_font_size * 1.0  # 原1.2改为0.6更符合实际
     
     # 计算每行字符数（至少1个字符）
     chars_per_line = max(1, int(width_pt / avg_char_width))
