@@ -21,7 +21,7 @@ class TranslationCore:
         # Write prompts in target language
         self.language_prompts = {
             "Chinese": {
-                "English": """You are a professional automotive translator. STRICT RULES:
+                "English": """You are a professional translator. STRICT RULES:
                     1. TRANSLATION RULES:
                     - PRESERVE acronyms/proper nouns (e.g., ZCU) 
                     - MAINTAIN technical tone
@@ -43,7 +43,7 @@ class TranslationCore:
                     - DO NOT summarize content
                     - REJECT creative translations"""
                 ,
-                "Japanese": """自動車専門翻訳者として厳格に遵守:
+                "Japanese": """優れたプロの翻訳者として厳格に遵守:
                     1. 翻訳規則:
                     - 略語/固有名詞保持（例：ZCU）
                     - 専門的表現厳守
@@ -68,7 +68,7 @@ class TranslationCore:
             },
 
             "English": {
-                "Chinese": """作为汽车行业专业翻译，请严格遵循：
+                "Chinese": """作为专业翻译，请严格遵循：
                     1. 翻译规则：
                     - 保留英文缩写/专有名词（例：ZCU）
                     - 保持技术文档的专业语气
@@ -90,7 +90,7 @@ class TranslationCore:
                     - 保持数字/时间格式不变
                     - 拒绝创造性翻译""",
 
-                "Japanese": """自動車技術翻訳者として厳守事項：
+                "Japanese": """優れたプロの翻訳者として厳守事項：
                     1. 翻訳規則：
                     - 英語略語/固有名詞保持（例：ZCU）
                     - 技術文書の専門的表現維持
@@ -113,7 +113,7 @@ class TranslationCore:
             },
 
             "Japanese": {
-                "Chinese": """作为汽车行业专业译员，请遵守：
+                "Chinese": """作为专业翻译员，请遵守：
                     1. 翻译规则：
                     - 保留日语汉字/片假名术语（例：ECU、ハイブリッド）
                     - 专业术语统一转换（例：ブレーキ → 制动器）
@@ -131,7 +131,7 @@ class TranslationCore:
                     - 人名/地名音译需准确
                     - 防止过度本地化""",
 
-                "English": """As automotive translation expert, follow STRICT rules:
+                "English": """As translation expert, follow STRICT rules:
                     1. Translation Rules:
                     - Preserve Japanese technical terms (e.g., ECU, ハイブリッド)
                     - Convert measurements to imperial/metric units when appropriate
@@ -231,13 +231,13 @@ class TranslationCore:
     def reflect_translation(self, translation, target_lang):
         """反思与反馈阶段：请模型检查初步翻译，指出问题并提出改进建议，输出必须为目标语言反馈"""
         if target_lang == "Chinese":
-            system_prompt = "你是一位汽车行业的翻译专家，请只提供简明、建设性的反馈，并请用中文回答。"
+            system_prompt = "你是一位翻译专家，请只提供简明、建设性的反馈，并请用中文回答。"
             user_prompt = "请审查以下翻译，指出可能存在的问题（例如不准确、格式、技术术语等），并提出改进建议：\n\n{translation}"
         elif target_lang == "Japanese":
-            system_prompt = "あなたは自動車産業の翻訳の専門家です。簡潔で建設的なフィードバックのみを提供し、日本語で回答してください。"
+            system_prompt = "あなたは翻訳の専門家です。簡潔で建設的なフィードバックのみを提供し、日本語で回答してください。"
             user_prompt = "以下の翻訳を確認し、問題点（不正確さ、フォーマット、技術用語の不整合など）を指摘し、改善案を提示してください：\n\n{translation}"
         else:
-            system_prompt = "You are a translation expert for the automotive industry. Provide only concise, constructive feedback. Please respond in English."
+            system_prompt = "You are a translation expert. Provide only concise, constructive feedback. Please respond in English."
             user_prompt = "Please review the following translation for issues (e.g., inaccuracies, formatting, technical terms) and provide suggestions for improvement:\n\n{translation}"
         
         reflection_template = ChatPromptTemplate([
@@ -252,13 +252,13 @@ class TranslationCore:
     def improve_translation(self, translation, feedback, target_lang):
         """迭代改进阶段：根据反馈改进初步翻译，输出必须为目标语言翻译文本"""
         if target_lang == "Chinese":
-            system_prompt = "你是一位汽车行业的专业翻译专家，擅长迭代改进。请仅输出改进后的翻译文本，并用中文回答。"
+            system_prompt = "你是一位专业翻译专家，擅长迭代改进。请仅输出改进后的翻译文本，并用中文回答。"
             user_prompt = "基于以下反馈：\n\n{feedback}\n\n请改进以下翻译：\n\n{translation}"
         elif target_lang == "Japanese":
-            system_prompt = "あなたは自動車産業の反復的な改善に優れたプロの翻訳者です。改良された翻訳文のみを出力し、日本語で回答してください。"
+            system_prompt = "あなたは反復的な改善に優れたプロの翻訳者です。改良された翻訳文のみを出力し、日本語で回答してください。"
             user_prompt = "以下のフィードバックに基づいて：\n\n{feedback}\n\n以下の翻訳を改善してください：\n\n{translation}"
         else:
-            system_prompt = "You are a professional translator specialized in iterative refinement for the automotive industry. Provide only the improved translation text. Please respond in English."
+            system_prompt = "You are a professional translator specialized in iterative refinement. Provide only the improved translation text. Please respond in English."
             user_prompt = "Based on the following feedback:\n\n{feedback}\n\nPlease refine the following translation:\n\n{translation}"
         
         improvement_template = ChatPromptTemplate([
@@ -291,15 +291,16 @@ class TranslationCore:
         initial_result = self.initial_translation(original_text, system_prompt)
         logging.info(f"Initial Translation: {initial_result}")
 
-        # 2. 反思与反馈
-        feedback_result = self.reflect_translation(initial_result, target_lang)
-        logging.info(f"Reflection Feedback: {feedback_result}")
+        # # 2. 反思与反馈
+        # feedback_result = self.reflect_translation(initial_result, target_lang)
+        # logging.info(f"Reflection Feedback: {feedback_result}")
 
-        # 3. 迭代改进
-        improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
-        logging.info(f"Improved Translation: {improved_result}")
+        # # 3. 迭代改进
+        # improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
+        # logging.info(f"Improved Translation: {improved_result}")
 
         # Log the translation process
-        logging.info(f"{original_text} → {initial_result} → {improved_result} Translating from {source_lang} to {target_lang} ")   
+        #logging.info(f"{original_text} → {initial_result} → {improved_result} Translating from {source_lang} to {target_lang} ")   
+        logging.info(f"{original_text} → {initial_result} Translating from {source_lang} to {target_lang} ")   
 
-        return improved_result
+        return initial_result

@@ -11,7 +11,13 @@ class AcronymManager:
             'ZCU': "ZCU",
             'ZCU_FR': "ZCU_FR",
             'ZCU_FL': "ZCU_FL",
-            'ZCU_R': "ZCU_R"                
+            'ZCU_R': "ZCU_R",
+            'HPC': "HPC",
+            'NTC': "NTC",
+            'Benz': "Benz",
+            'MB': "MB",
+            'PoC': "PoC",
+            'SoP': "SoP"                    
         }
         # 添加特殊字符
         self.special_characters = r'↑↓←→↗↙'
