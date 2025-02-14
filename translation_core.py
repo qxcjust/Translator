@@ -229,33 +229,18 @@ class TranslationCore:
         - 在每次重试时动态降低温度，以降低生成随机性从而减少幻觉
         - 如果校验通过，则返回翻译；否则记录幻觉并返回原文
         """
-        max_retry = MAX_RETRY
-        original_temperature = self.llm.temperature
-        translation = None
+        prompt_template = ChatPromptTemplate([
+            ("system", system_prompt),
+            ("user", "{input}")
+        ])
+        chain = prompt_template | self.llm | StrOutputParser()
+        translation = chain.invoke({"input": processed_text})
 
-        for attempt in range(max_retry):
-            # 每次重试时降低温度0.2，最低为0.0
-            current_temperature = max(0.0, original_temperature - (attempt * 0.5))
-            self.llm.temperature = current_temperature
-            logging.info(f"Attempt {attempt+1}/{max_retry} with temperature {current_temperature}")
-
-            prompt_template = ChatPromptTemplate([
-                ("system", system_prompt),
-                ("user", "{input}")
-            ])
-            chain = prompt_template | self.llm | StrOutputParser()
-            translation = chain.invoke({"input": processed_text})
-            
-            if self.validate_translation(processed_text, translation):
-                # 恢复原始温度后返回翻译结果
-                self.llm.temperature = original_temperature
-                return translation
-            
-            logging.warning(f"Validation failed at temperature {current_temperature}, retrying ({attempt+1}/{max_retry})")
+        # 可能无效情况下，记录LOG
+        if not self.validate_translation(processed_text, translation):
+            self.log_hallucination(processed_text, translation)
         
-        self.llm.temperature = original_temperature
-        self.log_hallucination(processed_text, translation)
-        return processed_text
+        return translation
     
 
     def reflect_translation(self, translation, target_lang):
