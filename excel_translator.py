@@ -2,6 +2,7 @@ import logging
 from openpyxl import load_workbook, Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Fill, Border, Alignment
+from openpyxl.drawing.image import Image
 
 logging.basicConfig(level=logging.INFO)
 
@@ -10,7 +11,7 @@ def translate_excel(translation_core, file_path, output_path, source_lang, targe
     logging.info(f"Starting translation of Excel file: {file_path}")
     
     # 加载原始工作簿和创建翻译后的工作簿
-    original_wb = load_workbook(file_path)
+    original_wb = load_workbook(file_path, data_only=True)
     translated_wb = Workbook()
     translated_wb.remove(translated_wb.active)  # 移除默认创建的空白Sheet
 
@@ -29,45 +30,39 @@ def translate_excel(translation_core, file_path, output_path, source_lang, targe
         for merged_range in original_sheet.merged_cells.ranges:
             translated_sheet.merge_cells(str(merged_range))
         
+        # 处理图片
+        for img in original_sheet._images:
+            translated_sheet.add_image(img, img.anchor)
+        
+        # TODO 处理形状
+        
         # 计算当前Sheet的总单元格数
-        total_rows = original_sheet.max_row
-        total_columns = original_sheet.max_column
-        total_cells = total_rows * total_columns
+        total_cells = original_sheet.max_row * original_sheet.max_column
         
         # 翻译单元格内容并复制格式
-        for row in original_sheet.iter_rows():
-            for cell in row:
-                # 处理单元格翻译
-                translated_value = cell.value
-                if isinstance(cell.value, str) and cell.value.strip():
-                    translated_value = _translate_cell_value(
-                        cell, translation_core, source_lang, target_lang
-                    )
-                
-                # 创建目标单元格并设置值
-                translated_cell = translated_sheet.cell(
-                    row=cell.row, 
-                    column=cell.column, 
-                    value=translated_value
-                )
-                
-                # 深度复制单元格样式
-                _copy_cell_style(cell, translated_cell)
-                
-                # 更新单元格翻译进度（基于行列号计算进度）
-                cell_position = (cell.row-1)*total_columns + (cell.column-1)
-                cell_progress = (cell_position + 1) / total_cells * 100
-                if task is not None:
-                    task.update_state(
-                        state='PROGRESS',
-                        meta={
-                            'current': sheet_idx,
-                            'total': total_sheets,
-                            'cell_progress': cell_progress,
-                            'sheet_progress': (sheet_idx-1)/total_sheets*100,
-                            'progress': ((sheet_idx-1) + cell_progress/100)/total_sheets*100
-                        }
-                    )
+        for row_idx, row in enumerate(original_sheet.iter_rows(), 1):
+            for cell_idx, cell in enumerate(row, 1):
+                if cell.value is not None and isinstance(cell.value, str) and cell.value.strip():  # 检查单元格内容是否为空白字符串
+                    translated_value = _translate_cell_value(cell, translation_core, source_lang, target_lang)
+                    translated_cell = translated_sheet.cell(row=cell.row, column=cell.column, value=translated_value)
+                    _copy_cell_style(cell, translated_cell)
+                    
+                    # 更新单元格翻译进度
+                    cell_progress = ((row_idx - 1) * original_sheet.max_column + cell_idx) / total_cells * 100
+                    if task is not None:
+                        task.update_state(
+                            state='PROGRESS',
+                            meta={
+                                'current': sheet_idx,
+                                'total': total_sheets,
+                                'cell_progress': cell_progress,
+                                'sheet_progress': (sheet_idx - 1) / total_sheets * 100,
+                                'progress': ((sheet_idx - 1) + cell_progress / 100) / total_sheets * 100
+                            }
+                        )
+                else:
+                    translated_cell = translated_sheet.cell(row=cell.row, column=cell.column)
+                    _copy_cell_style(cell, translated_cell)
         
         # 更新任务进度
         sheet_progress = (sheet_idx / total_sheets) * 100
@@ -91,7 +86,7 @@ def translate_excel(translation_core, file_path, output_path, source_lang, targe
 def _translate_cell_value(cell, translator, src_lang, tgt_lang):
     """翻译单元格文本内容"""
     try:
-        return translator.translate_text(cell.value, src_lang, tgt_lang)
+        return translator.translate_text(cell.value, src_lang, tgt_lang) if isinstance(cell.value, str) else cell.value
     except Exception as e:
         logging.error(f"Translation error at {cell.coordinate}: {str(e)}")
         return cell.value  # 出错时返回原值
