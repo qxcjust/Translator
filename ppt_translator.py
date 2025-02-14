@@ -6,6 +6,7 @@ from pptx.dml.color import RGBColor
 import traceback
 from pptx.util import Inches
 import re
+import math
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -79,7 +80,7 @@ def get_text_format(run, shape=None):
         color_rgb = None
         if font.color and font.color.type == 1:  # RGB颜色类型
             color_rgb = RGBColor(font.color.rgb[0], font.color.rgb[1], font.color.rgb[2])
-        elif font.color and font.color.theme_color:  # 主题颜色处理
+        elif font.color and hasattr(font.color, 'theme_color'):  # 主题颜色处理
             color_rgb = font.color.theme_color
 
         format_info = pptTextFormat(

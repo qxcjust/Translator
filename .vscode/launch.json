@@ -12,10 +12,10 @@
             "request": "launch",
             "program": "cl_interface.py",
             "args": [
-                ".\\Updatefile\\2025-02-13\\ra.xlsx",
-                ".\\translateFiles\\2025-02-13\\ra_Chinese.docx",
-                "Japanese",                
-                "Chinese"
+                ".\\Updatefile\\2025-02-14\\技术空间demo_20250121.pptx",
+                ".\\translateFiles\\2025-02-14\\技术空间demo_20250121_Japanese.pptx",
+                "Chinese",                
+                "Japanese"
             ],
             "console": "integratedTerminal"
         }

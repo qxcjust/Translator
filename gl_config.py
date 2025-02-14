@@ -7,7 +7,8 @@ LOG_LEVEL = logging.INFO
 # 模型配置
 MODEL_NAME = "qwen2.5:14b"
 ENDPOINT_URL = "http://192.168.146.137:11434/v1"
-TEMPERATURE = 0.2
+TEMPERATURE = 0.3
+API_KEY = "my-api-key"
 
 # Redis 配置
 REDIS_HOST = 'localhost'

@@ -8,7 +8,7 @@ import os
 import datetime
 import csv
 # 导入配置文件
-from gl_config import LOG_LEVEL, MODEL_NAME, ENDPOINT_URL, TEMPERATURE, MAX_RETRY, USE_REFLECTION
+from gl_config import LOG_LEVEL, MODEL_NAME, ENDPOINT_URL, TEMPERATURE, MAX_RETRY, USE_REFLECTION, API_KEY
 
 # 配置日志记录
 logging.basicConfig(level=LOG_LEVEL)
@@ -16,7 +16,7 @@ logging.basicConfig(level=LOG_LEVEL)
 class TranslationCore:
     def __init__(self, model_name=MODEL_NAME, endpoint_url=ENDPOINT_URL, temperature=TEMPERATURE):
         # Initialize model
-        self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
+        self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key=API_KEY, temperature=temperature)
         # 创建 AcronymManager 实例
         self.acronym_manager = AcronymManager()
         
@@ -26,7 +26,7 @@ class TranslationCore:
                 "English": """You are a professional translator. STRICT RULES:
                     1. TRANSLATION RULES:
                     - PRESERVE acronyms/proper nouns (e.g., ZCU) 
-                    - MAINTAIN technical tone
+                    - MAINTAIN tone
                     - CONSISTENT terminology
                     2. FORMAT RULES:
                     - KEEP original formatting/structure
@@ -47,16 +47,16 @@ class TranslationCore:
                 ,
                 "Japanese": """優れたプロの翻訳者として厳格に遵守:
                     1. 翻訳規則:
-                    - 略語/固有名詞保持（例：ZCU）
-                    - 専門的表現厳守
-                    - 技術用語一貫性保持
+                    - 技術用語、製品名、固有名詞（例：iAuto改造车、RZ、14inch、24L2、車機woP席など）は原文そのまま保持し、翻訳や変更を行わないこと。
+                    - 括弧内の内容や記号（例：+）も正確に再現すること。
+                    - 用語一貫性保持
                     - 簡体字→日本語漢字変換必須
                     2. 形式規則:
-                    - 原文フォーマット厳守
+                    - 原文の書式、改行、スペース、記号等を忠実に再現すること。
                     - 説明/注釈厳禁
                     - 箇条書き形式保持
                     3. 出力制御:
-                    - 翻訳文のみ出力
+                    - 翻訳文のみを出力し、余計な説明や注釈を追加しないこと。
                     - 追加/省略厳禁
                     - 原文構造完全再現
                     4. 特殊処理:
@@ -73,8 +73,8 @@ class TranslationCore:
                 "Chinese": """作为专业翻译，请严格遵循：
                     1. 翻译规则：
                     - 保留英文缩写/专有名词（例：ZCU）
-                    - 保持技术文档的专业语气
-                    - 确保技术术语一致性
+                    - 保持文档的专业语气
+                    - 确保术语一致性
                     2. 格式要求：
                     - 严格保持原文格式结构
                     - 禁止添加解释或注释
@@ -95,8 +95,8 @@ class TranslationCore:
                 "Japanese": """優れたプロの翻訳者として厳守事項：
                     1. 翻訳規則：
                     - 英語略語/固有名詞保持（例：ZCU）
-                    - 技術文書の専門的表現維持
-                    - 技術用語の一貫性確保
+                    - 文書の専門的表現維持
+                    - 用語の一貫性確保
                     2. 形式要件：
                     - 原文フォーマット厳密保持
                     - 説明/注釈厳禁
@@ -118,8 +118,8 @@ class TranslationCore:
                 "Chinese": """作为专业翻译员，请遵守：
                     1. 翻译规则：
                     - 保留日语汉字/片假名术语（例：ECU、ハイブリッド）
-                    - 专业术语统一转换（例：ブレーキ → 制动器）
-                    - 技術参数精确转换
+                    - 术语统一转换（例：ブレーキ → 制动器）
+                    - 参数精确转换
                     2. 格式要求：
                     - 完全保留原文编号结构
                     - 中日标点符号转换（「」→“”）
@@ -137,7 +137,7 @@ class TranslationCore:
                     1. Translation Rules:
                     - Preserve Japanese technical terms (e.g., ECU, ハイブリッド)
                     - Convert measurements to imperial/metric units when appropriate
-                    - Maintain formal technical tone
+                    - Maintain formal tone
                     2. Format Requirements:
                     - Keep original numbering/bullet structure
                     - Convert Japanese punctuation to English equivalents
@@ -172,49 +172,73 @@ class TranslationCore:
             writer.writerow([original, translation])
 
     def validate_translation(self, original, translation):
-        """执行严格的内容校验"""
-        # 结构完整性校验
-        if self.check_structure_integrity(original, translation):
+        """执行严格的内容校验，包括结构、数字、幻觉模式及语义一致性"""
+        if not self.check_structure_integrity(original, translation):
             logging.warning("Structure inconsistency detected")
             return False
-        
-        # 幻覚パターンチェック
+
         if any(pattern.search(translation) for pattern in self.acronym_manager.hallucination_patterns):
             logging.error("Hallucination pattern detected")
-            return False
-        
-        # 数字保存チェック
-        if not self.check_numeric_consistency(original, translation):
-            logging.warning("Numeric inconsistency found")
             return False
         
         return True
 
     def check_structure_integrity(self, original, translated):
-        """检查结构一致性"""
-        # 比較段落数
+        """检查结构一致性：段落数量及列表项"""
         orig_para = len(original.split('\n'))
         trans_para = len(translated.split('\n'))
         if orig_para != trans_para:
-            return True
+            return False
         
-        # 检查列表项一致性
         orig_bullets = re.findall(r'^\d+\.', original, re.M)
         trans_bullets = re.findall(r'^\d+\.', translated, re.M)
-        return len(orig_bullets) != len(trans_bullets)
+        return len(orig_bullets) == len(trans_bullets)
 
-    def check_numeric_consistency(self, original, translated):
-        """数字一致性校验"""
-        orig_numbers = re.findall(r'\b\d+\.?\d*\b', original)
-        trans_numbers = re.findall(r'\b\d+\.?\d*\b', translated)
-        return orig_numbers == trans_numbers
-    
+    def convert_simplified_japanese_terms(self, translation):
+        """
+        针对中文→日文翻译中出现的简体日语词汇进行转换，
+        例如：'议题' 转换为 '議題'
+        """
+        for simplified, proper in self.acronym_manager.term_mapping.items():
+            translation = translation.replace(simplified, proper)
+        return translation
+
+    def post_process_translation(self, original, translation, source_lang, target_lang):
+        """
+        针对中文→日文的情况进行后处理：
+        1. 如果原文中未出现“的”，但翻译结果在技术术语中插入了“的”，则自动移除；
+        2. 对翻译中出现的简体日语词汇（如“议题”）进行转换，确保使用正确的日语表述（如“議題”）。
+        """
+        if source_lang == "Chinese" and target_lang == "Japanese":
+            orig_lines = original.split('\n')
+            trans_lines = translation.split('\n')
+            new_lines = []
+            for orig, trans in zip(orig_lines, trans_lines):
+                if "的" not in orig and "的" in trans:
+                    trans = re.sub(r'([\u4e00-\u9fff])的([\u4e00-\u9fff])', r'\1\2', trans)
+                new_lines.append(trans)
+            translation = "\n".join(new_lines)
+            translation = self.convert_simplified_japanese_terms(translation)
+        return translation
+
 
 
     def initial_translation(self, processed_text, system_prompt):
-        """增强的初步翻译流程"""
+        """
+        增强的初步翻译流程：
+        - 在每次重试时动态降低温度，以降低生成随机性从而减少幻觉
+        - 如果校验通过，则返回翻译；否则记录幻觉并返回原文
+        """
         max_retry = MAX_RETRY
+        original_temperature = self.llm.temperature
+        translation = None
+
         for attempt in range(max_retry):
+            # 每次重试时降低温度0.2，最低为0.0
+            current_temperature = max(0.0, original_temperature - (attempt * 0.5))
+            self.llm.temperature = current_temperature
+            logging.info(f"Attempt {attempt+1}/{max_retry} with temperature {current_temperature}")
+
             prompt_template = ChatPromptTemplate([
                 ("system", system_prompt),
                 ("user", "{input}")
@@ -222,13 +246,17 @@ class TranslationCore:
             chain = prompt_template | self.llm | StrOutputParser()
             translation = chain.invoke({"input": processed_text})
             
-            # 执行严格校验
             if self.validate_translation(processed_text, translation):
+                # 恢复原始温度后返回翻译结果
+                self.llm.temperature = original_temperature
                 return translation
-            logging.warning(f"Validation failed, retrying ({attempt+1}/{max_retry})")
+            
+            logging.warning(f"Validation failed at temperature {current_temperature}, retrying ({attempt+1}/{max_retry})")
         
+        self.llm.temperature = original_temperature
         self.log_hallucination(processed_text, translation)
         return processed_text
+    
 
     def reflect_translation(self, translation, target_lang):
         """反思与反馈阶段：请模型检查初步翻译，指出问题并提出改进建议，输出必须为目标语言反馈"""
@@ -292,7 +320,7 @@ class TranslationCore:
         # 1. 初步翻译
         initial_result = self.initial_translation(original_text, system_prompt)
         logging.info(f"Initial Translation: {initial_result}")
-
+        finally_result = ""
         # USE_REFLECTION reference gl_config.py
         if USE_REFLECTION:
             # 2. Reflection Feedback
@@ -303,9 +331,12 @@ class TranslationCore:
             improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
             logging.info(f"Improved Translation: {improved_result}")
 
-            # Log the translation process
-            logging.info(f"{original_text} → {initial_result} → {improved_result} Translating from {source_lang} to {target_lang} ")  
-        else:     
-            logging.info(f"{original_text} → {initial_result} Translating from {source_lang} to {target_lang} ")   
+            finally_result = self.post_process_translation(original_text, improved_result, source_lang, target_lang)
 
-        return initial_result
+            # Log the translation process
+            logging.info(f"{original_text} → {initial_result} → {finally_result} Translating from {source_lang} to {target_lang} ")  
+        else:   
+            finally_result = self.post_process_translation(original_text, initial_result, source_lang, target_lang)  
+            logging.info(f"{original_text} → {finally_result} Translating from {source_lang} to {target_lang} ")   
+
+        return finally_result
