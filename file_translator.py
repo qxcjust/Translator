@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 class FileTranslator:
     def __init__(self):
-        self.translation_core = TranslationCore(endpoint_url="http://192.168.146.137:11434/v1")
+        self.translation_core = TranslationCore()
     def translate_file(self, file_path, output_path, source_lang, target_lang, task):
         logging.info(f"Starting translation of file: {file_path}")
         if file_path.endswith('.xlsx') or file_path.endswith('.xls'):

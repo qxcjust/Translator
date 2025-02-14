@@ -7,12 +7,14 @@ from acronym_manager import AcronymManager
 import os
 import datetime
 import csv
+# 导入配置文件
+from gl_config import LOG_LEVEL, MODEL_NAME, ENDPOINT_URL, TEMPERATURE, MAX_RETRY, USE_REFLECTION
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
 
 class TranslationCore:
-    def __init__(self, model_name="qwen2.5:14b", endpoint_url="http://192.168.146.137:11434/v1", temperature=0.2):
+    def __init__(self, model_name=MODEL_NAME, endpoint_url=ENDPOINT_URL, temperature=TEMPERATURE):
         # Initialize model
         self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key="my-api-key", temperature=temperature)
         # 创建 AcronymManager 实例
@@ -211,7 +213,7 @@ class TranslationCore:
 
     def initial_translation(self, processed_text, system_prompt):
         """增强的初步翻译流程"""
-        max_retry = 3
+        max_retry = MAX_RETRY
         for attempt in range(max_retry):
             prompt_template = ChatPromptTemplate([
                 ("system", system_prompt),
@@ -291,16 +293,19 @@ class TranslationCore:
         initial_result = self.initial_translation(original_text, system_prompt)
         logging.info(f"Initial Translation: {initial_result}")
 
-        # # 2. 反思与反馈
-        # feedback_result = self.reflect_translation(initial_result, target_lang)
-        # logging.info(f"Reflection Feedback: {feedback_result}")
+        # USE_REFLECTION reference gl_config.py
+        if USE_REFLECTION:
+            # 2. Reflection Feedback
+            feedback_result = self.reflect_translation(initial_result, target_lang)
+            logging.info(f"Reflection Feedback: {feedback_result}")
 
-        # # 3. 迭代改进
-        # improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
-        # logging.info(f"Improved Translation: {improved_result}")
+            # 3. Improved Translation
+            improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
+            logging.info(f"Improved Translation: {improved_result}")
 
-        # Log the translation process
-        #logging.info(f"{original_text} → {initial_result} → {improved_result} Translating from {source_lang} to {target_lang} ")   
-        logging.info(f"{original_text} → {initial_result} Translating from {source_lang} to {target_lang} ")   
+            # Log the translation process
+            logging.info(f"{original_text} → {initial_result} → {improved_result} Translating from {source_lang} to {target_lang} ")  
+        else:     
+            logging.info(f"{original_text} → {initial_result} Translating from {source_lang} to {target_lang} ")   
 
         return initial_result

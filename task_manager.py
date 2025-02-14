@@ -4,13 +4,14 @@ import logging
 import os
 from redis import Redis
 from redis.exceptions import ConnectionError
+from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
 
 app = Celery('task_manager', 
-             broker='redis://localhost:6379/0',
-             backend='redis://localhost:6379/0')
+             broker=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+             backend=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}')
 
 class TranslationError(Exception):
     """自定义翻译异常类"""

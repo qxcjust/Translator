@@ -17,7 +17,8 @@ class AcronymManager:
             'Benz': "Benz",
             'MB': "MB",
             'PoC': "PoC",
-            'SoP': "SoP"                    
+            'SoP': "SoP",
+            'VIN': "VIN"                    
         }
         # 添加特殊字符
         self.special_characters = r'↑↓←→↗↙'

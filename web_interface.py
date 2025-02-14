@@ -7,6 +7,7 @@ import logging
 import time
 from file_parsers import get_file_pages, get_file_size
 from celery.result import AsyncResult
+from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT, MIME_TO_EXTENSION
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -19,8 +20,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Celery配置
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+app.config['CELERY_BROKER_URL'] = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+app.config['CELERY_RESULT_BACKEND'] = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
 
 # 修改 Celery 初始化配置
 celery = Celery(app.name, 
@@ -66,16 +67,7 @@ def upload_file():
         file_mime_type = file.content_type
         
         # 转换MIME类型到缩写形式
-        mime_to_extension = {
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
-            'application/vnd.ms-powerpoint': 'PPT',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PPTX',
-            'application/vnd.ms-excel': 'XLS',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX'
-        }
-        
-        # 转换MIME类型到缩写形式
-        file_type = mime_to_extension.get(file_mime_type, file_extension)
+        file_type = MIME_TO_EXTENSION.get(file_mime_type, file_extension)
         
         logging.info(f"File uploaded successfully: {file_path}")
         return jsonify({
