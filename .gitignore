@@ -179,3 +179,7 @@ translateFiles/
 
 # .vscode
 .vscode/
+
+
+# logfiles
+logfiles/
