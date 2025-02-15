@@ -29,18 +29,18 @@
     <div class="container" id="textTranslateContainer" style="display: flex;">
         <div class="container" id="textTranslateContainer_Info">
             <div class="input-section">
-                <div class="language-selection">
-                    <span>中文(简体)</span>
-                    <span>日文</span>
-                    <span>英文</span>
+                <div class="language-selection" id="source_language_selection">
+                    <span data-value="Chinese">中文(简体)</span>
+                    <span data-value="Japanese" class="selected">日文</span>
+                    <span data-value="English">英文</span>
                 </div>
                 <textarea id="text-input" placeholder="请输入要翻译的文字"></textarea>
             </div>
             <div class="output-section">
-                <div class="language-selection">
-                    <span>中文(简体)</span>
-                    <span>日文</span>
-                    <span>英文</span>
+                <div class="language-selection" id="target_language_selection">
+                    <span data-value="Chinese" class="selected">中文(简体)</span>
+                    <span data-value="Japanese">日文</span>
+                    <span data-value="English">英文</span>
                 </div>
                 <textarea id="translated-text" placeholder="翻译结果将显示在这里"></textarea>
             </div>
@@ -132,6 +132,45 @@
         </div>
     </div>
     <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const sourceLanguageSelections = document.querySelectorAll('#source_language_selection span');
+            const targetLanguageSelections = document.querySelectorAll('#target_language_selection span');
+
+            // 添加点击事件监听器
+            sourceLanguageSelections.forEach(span => {
+                span.addEventListener('click', function() {
+                    // 移除所有选中状态
+                    sourceLanguageSelections.forEach(s => s.classList.remove('selected'));
+                    // 添加选中状态到当前点击的 span
+                    this.classList.add('selected');
+                });
+            });
+
+            targetLanguageSelections.forEach(span => {
+                span.addEventListener('click', function() {
+                    // 移除所有选中状态
+                    targetLanguageSelections.forEach(s => s.classList.remove('selected'));
+                    // 添加选中状态到当前点击的 span
+                    this.classList.add('selected');
+                });
+            });
+
+            // 获取选中的语言
+            function getSelectedLanguages() {
+                const sourceSelected = document.querySelector('#source_language_selection .selected');
+                const targetSelected = document.querySelector('#target_language_selection .selected');
+
+                const sourceLanguage = sourceSelected ? sourceSelected.dataset.value : null;
+                const targetLanguage = targetSelected ? targetSelected.dataset.value : null;
+
+                return {
+                    sourceLanguage: sourceLanguage,
+                    targetLanguage: targetLanguage
+                };
+            }
+        });
+
         // 获取元素
         const textTranslate = document.getElementById('textTranslate');
         const docTranslate = document.getElementById('docTranslate');

@@ -1,4 +1,3 @@
-/* ... existing code ... */
 body {
     font-family: '微软雅黑', sans-serif; /* 添加全局字体设置 */
 }
@@ -218,20 +217,33 @@ body {
 /* input-section 在 textTranslateContainer 容器内靠左对齐 */
 .input-section {
     margin-left: 0; /* 移除左边距 */
+    margin-bottom: 0;
 }
 
 /* output-section 在 textTranslateContainer 容器内靠右对齐 */
 .output-section {
     margin-right: 20px; /* 移除右边距 */
+    margin-bottom: 0;
 }
 
 textarea {
     width: 100%;
     height: 100px;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px linen #ddd;
     border-radius: 5px;
     resize: vertical;
+}
+
+#translated-text {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    resize: vertical;
+    color: #888;
+    background-color: #f9f9f9;
 }
 
 .translate-controls {
@@ -250,14 +262,20 @@ textarea {
     font-size: 16px;
 }
 
+.language-selection {
+    text-align: left;
+    margin-bottom: 10px;
+}
+
 .language-selection span {
-    margin-right: 20px;
-    padding: 5px 10px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    padding: 2px 2px;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .language-selection span.selected {
-    background-color: #007bff; /* 选中背景色 */
+    background-color: #9acafd; /* 选中背景色*/
     color: white; /* 选中文字颜色 */
 }
