@@ -20,7 +20,6 @@ class TranslationCore:
         # 创建 AcronymManager 实例
         self.acronym_manager = AcronymManager()
         
-        # Write prompts in target language
         self.language_prompts = {
             "Chinese": {
                 "English": """You are a professional translator. STRICT RULES:
@@ -28,6 +27,7 @@ class TranslationCore:
                     - PRESERVE acronyms/proper nouns (e.g., ZCU) 
                     - MAINTAIN tone
                     - CONSISTENT terminology
+                    - ISOLATED PHRASES: Translate directly without context (e.g. "参数" → "Parameters")
                     2. FORMAT RULES:
                     - KEEP original formatting/structure
                     - NO explanations/comments/footnotes
@@ -43,14 +43,17 @@ class TranslationCore:
                     - DO NOT add any information
                     - DO NOT interpret ambiguous terms
                     - DO NOT summarize content
-                    - REJECT creative translations"""
-                ,
+                    - TRANSLATE ALL phrases literally
+                    - REJECT creative translations""",
+                
                 "Japanese": """優れたプロの翻訳者として厳格に遵守:
                     1. 翻訳規則:
                     - 技術用語、製品名、固有名詞（例：iAuto改造车、RZ、14inch、24L2、車機woP席など）は原文そのまま保持し、翻訳や変更を行わないこと。
                     - 括弧内の内容や記号（例：+）も正確に再現すること。
+                    - 括弧内容完全再現
                     - 用語一貫性保持
                     - 簡体字→日本語漢字変換必須
+                    - 孤立語句: 文脈なしで直接翻訳（例："参数" → "パラメータ"）
                     2. 形式規則:
                     - 原文の書式、改行、スペース、記号等を忠実に再現すること。
                     - 説明/注釈厳禁
@@ -62,10 +65,13 @@ class TranslationCore:
                     4. 特殊処理:
                     - 公式日本語名称使用
                     - 不明略語は保持
-                    5. 幻覚防止:
+                    5. 注意事項:
                     - 独自解釈厳禁
                     - 曖昧語句は原文保持
-                    - 要約厳禁
+                    - 要約厳禁                    
+                    - 数字/時刻形式変更禁止
+                    - 文頭記号変更不可
+                    - 全ての語句を文字通り翻訳
                     - 創造的翻訳拒否"""
             },
 
@@ -75,6 +81,7 @@ class TranslationCore:
                     - 保留英文缩写/专有名词（例：ZCU）
                     - 保持文档的专业语气
                     - 确保术语一致性
+                    - 孤立短语直接翻译（如"Agenda"→"议程"）
                     2. 格式要求：
                     - 严格保持原文格式结构
                     - 禁止添加解释或注释
@@ -90,13 +97,15 @@ class TranslationCore:
                     - 禁止添加任何信息
                     - 不解释模糊术语
                     - 保持数字/时间格式不变
+                    - 所有短语逐字翻译
                     - 拒绝创造性翻译""",
 
                 "Japanese": """優れたプロの翻訳者として厳守事項：
                     1. 翻訳規則：
                     - 英語略語/固有名詞保持（例：ZCU）
-                    - 文書の専門的表現維持
-                    - 用語の一貫性確保
+                    - 専門的表現維持
+                    - 用語一貫性確保
+                    - 孤立語句: 文脈なし直接翻訳（例："Agenda"→"議題"）
                     2. 形式要件：
                     - 原文フォーマット厳密保持
                     - 説明/注釈厳禁
@@ -111,6 +120,7 @@ class TranslationCore:
                     5. 注意事項：
                     - 数字（3.14）、時刻（14:30）形式変更禁止
                     - 文頭の数字/記号（1. 2. 等）変更不可
+                    - 全語句逐語訳実施
                     - 幻覚的翻訳厳禁"""
             },
 
@@ -119,6 +129,7 @@ class TranslationCore:
                     1. 翻译规则：
                     - 保留日语汉字/片假名术语（例：ECU、ハイブリッド）
                     - 术语统一转换（例：ブレーキ → 制动器）
+                    - 孤立短语直接翻译（例：「議題」→"议程"）
                     - 参数精确转换
                     - 不翻译中文
                     2. 格式要求：
@@ -144,6 +155,7 @@ class TranslationCore:
                     - Preserve Japanese technical terms (e.g., ECU, ハイブリッド)
                     - Convert measurements to imperial/metric units when appropriate
                     - Maintain formal tone
+                    - Translate isolated phrases literally (e.g. 「議題」→ "Agenda")
                     2. Format Requirements:
                     - Keep original numbering/bullet structure
                     - Convert Japanese punctuation to English equivalents
@@ -155,7 +167,10 @@ class TranslationCore:
                     4. Quality Control:
                     - No translator's notes
                     - Accurate transliteration of proper nouns
-                    - Avoid over-localization"""
+                    - Avoid over-localization
+                    5. Literal Translation:
+                    - Translate all phrases regardless of context
+                    - Strictly prohibit omission"""
             }
         }
 
