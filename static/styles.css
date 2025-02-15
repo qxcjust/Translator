@@ -188,12 +188,27 @@ body {
     border-radius: 5px;
     position: relative; /* 添加相对定位 */
     display: flex; /* 使用 flex 布局 */
-    flex-direction: row; /* 水平布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
 }
 
+#textTranslateContainer_extra {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px dashed #ddd; /* 添加虚线边框 */
+    border-radius: 5px;
+    width: 80%; /* 设置宽度为48%，留出一些间距 */
+    position: relative; /* 添加相对定位 */
+    display: flex; /* 使用 flex 布局 */
+    flex-direction: row; /* 水平布局 */
+    justify-content: space-between; /* 确保两个部分之间有间距 */
+    align-items: flex-start; /* 顶部对齐 */
+}
+
+
 .input-section, .output-section {
-    margin-bottom: 10px;
-    width: 45%; /* 设置宽度为45%，留出一些间距 */
+    margin: 10px;
+    width: 35%; /* 设置宽度为48%，留出一些间距 */
     vertical-align: top; /* 确保文本框顶部对齐 */
     text-align: center; /* 使内容居中 */
 }
@@ -201,12 +216,10 @@ body {
 /* input-section 在 textTranslateContainer 容器内靠左对齐 */
 .input-section {
     margin-left: 0; /* 移除左边距 */
-    margin-right: 5%;
 }
 
 /* output-section 在 textTranslateContainer 容器内靠右对齐 */
 .output-section {
-    margin-left: 5%;
     margin-right: 20px; /* 移除右边距 */
 }
 
