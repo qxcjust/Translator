@@ -26,6 +26,17 @@
 <body>
     <h1 class="page-title active" id="textTranslate">文字翻译</h1>  
     <h1 class="page-title inactive" id="docTranslate">文档翻译</h1>
+    <div class="container" id="textTranslateContainer">
+        <div class="input-section">
+            <textarea id="text-input" placeholder="请输入要翻译的文字"></textarea>
+        </div>
+        <div class="translate-controls">
+            <button id="translate-button">翻译</button>
+        </div>
+        <div class="output-section">
+            <textarea id="translated-text" placeholder="翻译结果将显示在这里"></textarea>
+        </div>
+    </div>
     <div class="container" id="fileTranslateContainer" style="display: none;">
         <div class="upload-section" id="uploadSection">
             <div class="icon-section">
@@ -115,6 +126,7 @@
         // 获取元素
         const textTranslate = document.getElementById('textTranslate');
         const docTranslate = document.getElementById('docTranslate');
+        const textTranslateContainer = document.getElementById('textTranslateContainer');
         const fileTranslateContainer = document.getElementById('fileTranslateContainer');
 
         // 添加点击事件
@@ -123,6 +135,7 @@
             textTranslate.classList.add('active');
             docTranslate.classList.remove('active');
             docTranslate.classList.add('inactive');
+            textTranslateContainer.style.display = 'block';
             fileTranslateContainer.style.display = 'none';
         });
 
@@ -131,6 +144,7 @@
             docTranslate.classList.add('active');
             textTranslate.classList.remove('active');
             textTranslate.classList.add('inactive');
+            textTranslateContainer.style.display = 'none';
             fileTranslateContainer.style.display = 'block';
         });
 
