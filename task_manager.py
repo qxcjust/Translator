@@ -23,10 +23,10 @@ def translate_file(self, file_path, output_path, source_lang, target_lang):
     文件翻译任务
     """
     logging.info(f"Starting translation for file: {file_path}")
-    file_translator = Translator()
+    translator = Translator()
     try:
         logging.info(f"Initializing translation for file: {file_path}")
-        file_translator.translate_file(file_path, output_path, source_lang, target_lang, self)
+        translator.translate_file(file_path, output_path, source_lang, target_lang, self)
         logging.info(f"Translation completed for file: {file_path}")
         
         return {
