@@ -248,6 +248,39 @@ class TranslationCore:
         
         return translation
     
+    
+    def initial_translation_with_lang(self, processed_text, source_lang, target_lang):
+        """
+        初步翻译阶段：
+        根据 source_lang 与 target_lang 使用对应的翻译提示，
+        确保输出仅为翻译结果，且严格保留原文格式，不添加其他解释或评论。
+        """
+        # 优化后的系统提示：要求仅进行翻译，保留原格式，不添加多余内容
+        system_prompt = (
+            f"You are a professional translator. "
+            f"Translate the provided text from {source_lang} to {target_lang} strictly, "
+            "preserving the original formatting, punctuation, and spacing. "
+            "Do not add any commentary, explanations, or extra content."
+        )
+        
+        # 根据目标语言选择合适的用户提示，便于后续扩展其他语言
+        user_prompts = {
+            "Chinese": "请翻译以下文本：\n\n{input}",
+            "Japanese": "以下のテキストを翻訳してください：\n\n{input}",
+            # 默认使用英文提示
+            "English": "Please translate the following text:\n\n{input}"
+        }
+        user_prompt = user_prompts.get(target_lang, "Please translate the following text:\n\n{input}")
+        
+        prompt_template = ChatPromptTemplate([
+            ("system", system_prompt),
+            ("user", user_prompt)
+        ])
+        
+        chain = prompt_template | self.llm | StrOutputParser()
+        translation = chain.invoke({"input": processed_text})
+        
+        return translation
 
     def reflect_translation(self, translation, target_lang):
         """反思与反馈阶段：请模型检查初步翻译，指出问题并提出改进建议，输出必须为目标语言反馈"""
@@ -333,7 +366,7 @@ class TranslationCore:
         return finally_result
     
     
-    def translate_pure_text(self, text, source_lang, target_lang ):
+    def translate_pure_text(self, text, source_lang, target_lang, use_reflection=USE_REFLECTION):
         """Translate text"""
         original_text = text
         if not text or text.strip() == "":
@@ -345,27 +378,21 @@ class TranslationCore:
         if re.match(rf'^[{alphanumeric_chars}{special_chars}]*$', text):  
             return original_text
     
-        # 获取初步翻译的系统提示
-        system_prompt = self.get_prompt(source_lang, target_lang)
-        if not system_prompt:
-            raise ValueError(f"Unsupported language pair: {source_lang} to {target_lang}")
-
         # 1. 初步翻译
-        initial_result = self.initial_translation(original_text, system_prompt)
+        initial_result = self.initial_translation_with_lang(original_text, source_lang, target_lang)
         logging.info(f"Initial Translation: {initial_result}")
-        finally_result = ""
         
-        # 2. Reflection Feedback
-        feedback_result = self.reflect_translation(initial_result, target_lang)
-        logging.info(f"Reflection Feedback: {feedback_result}")
+        if use_reflection:
+            # 2. Reflection Feedback
+            feedback_result = self.reflect_translation(initial_result, target_lang)
+            logging.info(f"Reflection Feedback: {feedback_result}")
 
-        # 3. Improved Translation
-        improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
-        logging.info(f"Improved Translation: {improved_result}")
-
-        finally_result = self.post_process_translation(original_text, improved_result, source_lang, target_lang)
-
-        # Log the translation process
+            # 3. Improved Translation
+            finally_result = self.improve_translation(initial_result, feedback_result, target_lang)
+            logging.info(f"Improved Translation: {finally_result}")
+        else:
+            finally_result = initial_result
+        
         logging.info(f"{original_text} → {initial_result} → {finally_result} Translating from {source_lang} to {target_lang} ")  
 
         return finally_result    
