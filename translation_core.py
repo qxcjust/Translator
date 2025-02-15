@@ -331,3 +331,41 @@ class TranslationCore:
             logging.info(f"{original_text} → {finally_result} Translating from {source_lang} to {target_lang} ")   
 
         return finally_result
+    
+    
+    def translate_pure_text(self, text, source_lang, target_lang ):
+        """Translate text"""
+        original_text = text
+        if not text or text.strip() == "":
+            return original_text  # 直接返回空字符串，不进行翻译处理
+        
+        # 匹配英文，中文，日文字母、数字、空格、标点符号、括号和连字符，以及箭头符号
+        alphanumeric_chars = self.acronym_manager.alphanumeric_chars
+        special_chars = self.acronym_manager.special_characters
+        if re.match(rf'^[{alphanumeric_chars}{special_chars}]*$', text):  
+            return original_text
+    
+        # 获取初步翻译的系统提示
+        system_prompt = self.get_prompt(source_lang, target_lang)
+        if not system_prompt:
+            raise ValueError(f"Unsupported language pair: {source_lang} to {target_lang}")
+
+        # 1. 初步翻译
+        initial_result = self.initial_translation(original_text, system_prompt)
+        logging.info(f"Initial Translation: {initial_result}")
+        finally_result = ""
+        
+        # 2. Reflection Feedback
+        feedback_result = self.reflect_translation(initial_result, target_lang)
+        logging.info(f"Reflection Feedback: {feedback_result}")
+
+        # 3. Improved Translation
+        improved_result = self.improve_translation(initial_result, feedback_result, target_lang)
+        logging.info(f"Improved Translation: {improved_result}")
+
+        finally_result = self.post_process_translation(original_text, improved_result, source_lang, target_lang)
+
+        # Log the translation process
+        logging.info(f"{original_text} → {initial_result} → {finally_result} Translating from {source_lang} to {target_lang} ")  
+
+        return finally_result    

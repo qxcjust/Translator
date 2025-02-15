@@ -452,14 +452,42 @@
                 },
                 body: JSON.stringify({ text: textToTranslate, source_lang: sourceLanguage, target_lang: targetLanguage})
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                translatedText.textContent = data.translation;
+                const taskId = data.task_id;
+                pollTranslationText(taskId);  // Start polling for the translation status
             })
             .catch(error => {
                 translatedText.textContent = '翻译失败，请重试';
                 console.error('Error:', error);
             });
+        }
+
+        // 轮询翻译进度
+        function pollTranslationText(taskId) {
+            const intervalId = setInterval(() => {
+                fetch(`/translation_text/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.state === 'SUCCESS') {
+                        clearInterval(intervalId);  // Stop polling
+                        document.getElementById('translated-text').textContent = data.result;  // Set the translated text
+                        console.log('Translation successful:', data.result);
+                    } else if (data.state === 'FAILURE') {
+                        clearInterval(intervalId);  // Stop polling
+                        alert('Translation failed: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearInterval(intervalId);  // Stop polling
+                });
+            }, 3000);  // Poll every 3 seconds
         }
 
     </script>

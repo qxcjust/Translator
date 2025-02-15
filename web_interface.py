@@ -205,10 +205,46 @@ def translate_text():
     if not source_text or not source_lang or not target_lang:
         return jsonify({"error": "Missing required parameters"}), 400
     try:
-        translation = translate_texts.delay(source_text, source_lang, target_lang)
-        return jsonify({"translation": translation})
+        task = translate_texts.apply_async(
+                args=(source_text, source_lang, target_lang),
+                kwargs={}
+            )
+        return jsonify({"task_id": task.id}), 202  # Return the task ID
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# 获取翻译结果的接口
+@app.route('/translation_text/<task_id>', methods=['GET'])
+def translation_text(task_id):
+    task = AsyncResult(task_id, app=celery)
+    # 基础响应结构
+    response = {
+        'state': task.state,
+        'status': None,
+        'result': None
+    }
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'status': 'pending...'
+        }
+    elif task.state == 'SUCCESS':
+        meta = task.info
+        response = {
+            'state': task.state,
+            'result': meta.get('translate_result')
+        }
+    elif task.state == 'FAILURE':
+        response = {
+            'state': task.state,
+            'result': 'Translation failed'
+        }
+    else:
+        response = {
+            'state': task.state,
+            'status': 'processing...'
+        }
+    return jsonify(response)    
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True) #自动使用电脑IP

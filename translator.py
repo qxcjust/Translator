@@ -34,5 +34,12 @@ class Translator:
             raise ValueError(f"Unsupported file type: {file_path}")
         logging.info(f"Completed translation of file: {file_path}")
     
-    def translate_text(self, text, source_lang, target_lang):
-        return self.translation_core.translate_text(text, source_lang, target_lang, True)
+    def translate_text(self, text, source_lang, target_lang, task):
+        translatetext=self.translation_core.translate_pure_text(text, source_lang, target_lang)
+        if task is not None:
+            task.update_state(
+            state='SUCCESS',
+            meta={
+                'translate_result': translatetext
+            }
+        )

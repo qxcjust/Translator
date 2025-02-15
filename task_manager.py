@@ -52,5 +52,10 @@ def translate_file(self, file_path, output_path, source_lang, target_lang):
 
 @app.task(bind=True)
 def translate_texts(self, text, source_lang, target_lang):
-    translator = Translator()
-    return translator.translate_text(text, source_lang, target_lang)
+    try:
+        translator = Translator()
+        translator.translate_text(text, source_lang, target_lang, self)
+    except Exception as e:
+        logging.error(f"Error during translation for {text}: {str(e)}")
+        error = TranslationError(f"Translation failed: {str(e)}")
+        raise error
