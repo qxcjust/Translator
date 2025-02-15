@@ -191,6 +191,9 @@ body {
 
 .input-section, .output-section {
     margin-bottom: 10px;
+    display: inline-block; /* 添加此行，使输入框和输出框水平排列 */
+    width: 48%; /* 设置宽度为48%，留出一些间距 */
+    vertical-align: top; /* 确保文本框顶部对齐 */
 }
 
 textarea {
@@ -204,6 +207,7 @@ textarea {
 
 .translate-controls {
     text-align: center;
+    margin: 10px 0; /* 调整按钮的上下间距 */
 }
 
 #translate-button {
