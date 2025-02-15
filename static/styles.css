@@ -184,16 +184,30 @@ body {
 #textTranslateContainer {
     margin-top: 20px;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 2px dashed #ddd; /* 添加虚线边框 */
     border-radius: 5px;
-    background-color: #f9f9f9;
+    position: relative; /* 添加相对定位 */
+    display: flex; /* 使用 flex 布局 */
+    flex-direction: row; /* 水平布局 */
 }
 
 .input-section, .output-section {
     margin-bottom: 10px;
-    display: inline-block; /* 添加此行，使输入框和输出框水平排列 */
-    width: 48%; /* 设置宽度为48%，留出一些间距 */
+    width: 45%; /* 设置宽度为45%，留出一些间距 */
     vertical-align: top; /* 确保文本框顶部对齐 */
+    text-align: center; /* 使内容居中 */
+}
+
+/* input-section 在 textTranslateContainer 容器内靠左对齐 */
+.input-section {
+    margin-left: 0; /* 移除左边距 */
+    margin-right: 5%;
+}
+
+/* output-section 在 textTranslateContainer 容器内靠右对齐 */
+.output-section {
+    margin-left: 5%;
+    margin-right: 20px; /* 移除右边距 */
 }
 
 textarea {
