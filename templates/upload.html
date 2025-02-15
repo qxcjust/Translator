@@ -9,13 +9,24 @@
         .page-title {
             display: inline-block;
             margin-right: 20px; /* 添加右边距以分隔两个标题 */
+            cursor: pointer; /* 添加鼠标指针样式 */
+            padding: 10px; /* 添加内边距 */
+            border-radius: 5px; /* 添加圆角 */
+        }
+        .page-title.active {
+            background-color: #007bff; /* 选中背景色 */
+            color: white; /* 选中文字颜色 */
+        }
+        .page-title.inactive {
+            background-color: #f8f9fa; /* 非选中背景色 */
+            color: #333; /* 非选中文字颜色 */
         }
     </style>
 </head>
 <body>
-    <h1 class="page-title">智能文字翻译</h1>  
-    <h1 class="page-title">智能文档翻译</h1>
-    <div class="container" id="fileTranslateContainer">
+    <h1 class="page-title active" id="textTranslate">智能文字翻译</h1>  
+    <h1 class="page-title inactive" id="docTranslate">智能文档翻译</h1>
+    <div class="container" id="fileTranslateContainer" style="display: none;">
         <div class="upload-section" id="uploadSection">
             <div class="icon-section">
                 <img src="{{ url_for('static', filename='images/icon-word.png') }}" alt="Word Icon">
@@ -101,6 +112,28 @@
         </div>
     </div>
     <script>
+        // 获取元素
+        const textTranslate = document.getElementById('textTranslate');
+        const docTranslate = document.getElementById('docTranslate');
+        const fileTranslateContainer = document.getElementById('fileTranslateContainer');
+
+        // 添加点击事件
+        textTranslate.addEventListener('click', function() {
+            textTranslate.classList.remove('inactive');
+            textTranslate.classList.add('active');
+            docTranslate.classList.remove('active');
+            docTranslate.classList.add('inactive');
+            fileTranslateContainer.style.display = 'none';
+        });
+
+        docTranslate.addEventListener('click', function() {
+            docTranslate.classList.remove('inactive');
+            docTranslate.classList.add('active');
+            textTranslate.classList.remove('active');
+            textTranslate.classList.add('inactive');
+            fileTranslateContainer.style.display = 'block';
+        });
+
         // 添加JavaScript代码以关联按钮和文件输入
         document.getElementById('selectFileBtn').addEventListener('click', function() {
             document.getElementById('fileInput').click();

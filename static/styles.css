@@ -9,6 +9,19 @@ body {
     color: #374567;
     margin-bottom: 20px;
     text-align: left;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.page-title.active {
+    background-color: #007bff; /* 选中背景色 */
+    color: white; /* 选中文字颜色 */
+}
+
+.page-title.inactive {
+    background-color: #f8f9fa; /* 非选中背景色 */
+    color: #333; /* 非选中文字颜色 */
 }
 
 .upload-section {
