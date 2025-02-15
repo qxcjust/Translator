@@ -291,7 +291,7 @@ class TranslationCore:
         return improved_translation
 
 
-    def translate_text(self, text, source_lang, target_lang):
+    def translate_text(self, text, source_lang, target_lang, use_reflection=USE_REFLECTION):
         """Translate text"""
         original_text = text
         if not text or text.strip() == "":
@@ -313,7 +313,7 @@ class TranslationCore:
         logging.info(f"Initial Translation: {initial_result}")
         finally_result = ""
         # USE_REFLECTION reference gl_config.py
-        if USE_REFLECTION:
+        if use_reflection:
             # 2. Reflection Feedback
             feedback_result = self.reflect_translation(initial_result, target_lang)
             logging.info(f"Reflection Feedback: {feedback_result}")

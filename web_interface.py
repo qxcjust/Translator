@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
-from task_manager import translate_file, app as celery
+from task_manager import translate_file, translate_texts, app as celery
 import os
 from datetime import datetime
 from celery import Celery
@@ -194,10 +194,7 @@ def download():
     # 发送文件
     return send_from_directory(os.path.dirname(file_path), file_name, as_attachment=True)
 
-def agentic_translate(source_text, source_lang, target_lang):
-    return "AAAA"
     
-
 # text文字翻译接口
 @app.route('/translate_text', methods=['POST'])
 def translate_text():
@@ -208,7 +205,7 @@ def translate_text():
     if not source_text or not source_lang or not target_lang:
         return jsonify({"error": "Missing required parameters"}), 400
     try:
-        translation = agentic_translate(source_text, source_lang, target_lang)
+        translation = translate_texts.delay(source_text, source_lang, target_lang)
         return jsonify({"translation": translation})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

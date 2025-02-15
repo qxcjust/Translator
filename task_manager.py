@@ -48,3 +48,9 @@ def translate_file(self, file_path, output_path, source_lang, target_lang):
             }
         )
         raise error
+
+
+@app.task(bind=True)
+def translate_texts(self, text, source_lang, target_lang):
+    translator = Translator()
+    return translator.translate_text(text, source_lang, target_lang)
