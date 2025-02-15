@@ -411,8 +411,8 @@
         textInput.addEventListener('input', function() {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(() => {
-                translateText();
-            }, 3000);
+               translateText();
+            }, 1000);
         });
 
         textInput.addEventListener('keydown', function(event) {

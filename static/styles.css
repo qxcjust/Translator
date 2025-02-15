@@ -276,6 +276,8 @@ textarea:focus {
     
     /* 可选：保留文本换行格式 */
     white-space: pre-wrap; 
+
+    text-align: left; /* 使内容居中 */
 }
 
 .translate-controls {
