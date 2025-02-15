@@ -182,34 +182,36 @@ body {
 }
 
 #textTranslateContainer {
+    /* 保持原有基本样式 */
     margin-top: 20px;
     padding: 20px;
-    border: 2px dashed #ddd; /* 添加虚线边框 */
+    border: 2px dashed #ddd;
     border-radius: 5px;
-    position: relative; /* 添加相对定位 */
-    display: flex; /* 使用 flex 布局 */
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
+    position: relative;
+    
+    /* 修改布局属性 */
+    display: flex; /* 强制使用flex布局 */
+    justify-content: flex-start; /* 左侧对齐 */
 }
 
 #textTranslateContainer_extra {
-    margin-top: 20px;
-    padding: 20px;
-    border: 2px dashed #ddd; /* 添加虚线边框 */
-    border-radius: 5px;
-    width: 80%; /* 设置宽度为48%，留出一些间距 */
-    position: relative; /* 添加相对定位 */
-    display: flex; /* 使用 flex 布局 */
-    flex-direction: row; /* 水平布局 */
-    justify-content: space-between; /* 确保两个部分之间有间距 */
-    align-items: flex-start; /* 顶部对齐 */
+    /* 保持原有基本样式 */
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px dashed #ddd;
+    border-radius: 5px; 
+    width: 80%;
+    
+    /* 修改布局属性 */
+    position: static; /* 移除相对定位 */
+    margin-left: auto; /* 通过自动边距实现居中 */
+    margin-right: auto;
+    display: flex; /* 强制flex布局 */
 }
 
-
 .input-section, .output-section {
-    margin: 10px;
-    width: 35%; /* 设置宽度为48%，留出一些间距 */
-    vertical-align: top; /* 确保文本框顶部对齐 */
+    margin: 20px;
+    width: 50%;
     text-align: center; /* 使内容居中 */
 }
 

@@ -26,7 +26,7 @@
 <body>
     <h1 class="page-title active" id="textTranslate">文字翻译</h1>  
     <h1 class="page-title inactive" id="docTranslate">文档翻译</h1>
-    <div class="container" id="textTranslateContainer">
+    <div class="container" id="textTranslateContainer" style="display: flex;">
         <div class="container" id="textTranslateContainer_extra">
             <div class="input-section">
                 <textarea id="text-input" placeholder="请输入要翻译的文字"></textarea>
@@ -134,7 +134,7 @@
             textTranslate.classList.add('active');
             docTranslate.classList.remove('active');
             docTranslate.classList.add('inactive');
-            textTranslateContainer.style.display = 'block';
+            textTranslateContainer.style.display = 'flex';
             fileTranslateContainer.style.display = 'none';
         });
 
