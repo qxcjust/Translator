@@ -18,7 +18,8 @@ class AcronymManager:
             'MB': "MB",
             'PoC': "PoC",
             'SoP': "SoP",
-            'VIN': "VIN"       
+            'VIN': "VIN",
+            "议题": "議題"       
         }
         # 添加特殊字符
         self.special_characters = r'↑↓←→↗↙'

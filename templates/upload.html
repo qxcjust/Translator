@@ -5,17 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能文档翻译</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .page-title {
+            display: inline-block;
+            margin-right: 20px; /* 添加右边距以分隔两个标题 */
+        }
+    </style>
 </head>
 <body>
+    <h1 class="page-title">智能文字翻译</h1>  
+    <h1 class="page-title">智能文档翻译</h1>
     <div class="container">
-        <h1 class="page-title">智能文档翻译</h1>
-        <h1 class="page-title">智能文字翻译</h1>        
         <div class="upload-section" id="uploadSection">
             <div class="icon-section">
                 <img src="{{ url_for('static', filename='images/icon-word.png') }}" alt="Word Icon">
                 <img src="{{ url_for('static', filename='images/icon-excel.png') }}" alt="Excel Icon">
                 <img src="{{ url_for('static', filename='images/icon-powerpoint.png') }}" alt="PowerPoint Icon">
-                <img src="{{ url_for('static', filename='images/icon-pdf.png') }}" alt="PDF Icon">
+                <!-- <img src="{{ url_for('static', filename='images/icon-pdf.png') }}" alt="PDF Icon"> -->
             </div>
             <p class="supported-formats" style="color: rgb(55, 69, 103);">
                 点击或拖动文件上传
