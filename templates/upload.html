@@ -42,7 +42,7 @@
                     <span data-value="Japanese">日文</span>
                     <span data-value="English">英文</span>
                 </div>
-                <textarea id="translated-text" placeholder="翻译" readonly></textarea>
+                <div id="translated-text" readonly></div>
             </div>
         </div>
     </div>
@@ -399,6 +399,67 @@
                     clearInterval(intervalId); // 停止轮询以避免无限循环
                 });
             }, 5000); // 每秒查询一次进度
+        }
+
+
+
+        const textInput = document.getElementById('text-input');
+        const translatedText = document.getElementById('translated-text');
+
+        let debounceTimeout;
+
+        textInput.addEventListener('input', function() {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                translateText();
+            }, 3000);
+        });
+
+        textInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                clearTimeout(debounceTimeout);
+                translateText();
+            }
+        });
+
+        function translateText() {
+            const textToTranslate = textInput.value;
+            if (textToTranslate.trim() === '') {
+                translatedText.textContent = '';
+                return;
+            }
+
+            const sourceSelected = document.querySelector('#source_language_selection .selected');
+            const targetSelected = document.querySelector('#target_language_selection .selected');
+
+            const sourceLanguage = sourceSelected ? sourceSelected.dataset.value : null;
+            const targetLanguage = targetSelected ? targetSelected.dataset.value : null;
+
+            console.log('Source Language:', sourceLanguage);
+            console.log('Target Language:', targetLanguage);
+
+            if (sourceLanguage === targetLanguage) {
+                return;
+            } 
+
+            translatedText.textContent = translatedText.textContent + '...';
+
+            // 假设有一个翻译API或者函数，这里用fetch模拟
+            fetch('/translate_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: textToTranslate, source_lang: sourceLanguage, target_lang: targetLanguage})
+            })
+            .then(response => response.json())
+            .then(data => {
+                translatedText.textContent = data.translation;
+            })
+            .catch(error => {
+                translatedText.textContent = '翻译失败，请重试';
+                console.error('Error:', error);
+            });
         }
 
     </script>

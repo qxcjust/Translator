@@ -6,7 +6,7 @@ from word_translator import translate_word
 
 logging.basicConfig(level=logging.INFO)
 
-class FileTranslator:
+class Translator:
     def __init__(self):
         self.translation_core = TranslationCore()
     def translate_file(self, file_path, output_path, source_lang, target_lang, task):
@@ -28,3 +28,6 @@ class FileTranslator:
                 task.update_state(state='FAILURE', meta={'error': "Unsupported file type"})
             raise ValueError(f"Unsupported file type: {file_path}")
         logging.info(f"Completed translation of file: {file_path}")
+    
+    def translate_text(self, text, source_lang, target_lang):
+        return self.translation_core.translate_text(text, source_lang, target_lang)

@@ -194,6 +194,25 @@ def download():
     # 发送文件
     return send_from_directory(os.path.dirname(file_path), file_name, as_attachment=True)
 
+def agentic_translate(source_text, source_lang, target_lang):
+    return "AAAA"
+    
+
+# text文字翻译接口
+@app.route('/translate_text', methods=['POST'])
+def translate_text():
+    data = request.get_json()
+    source_text = data.get('text')
+    source_lang = data.get('source_lang')
+    target_lang = data.get('target_lang')
+    if not source_text or not source_lang or not target_lang:
+        return jsonify({"error": "Missing required parameters"}), 400
+    try:
+        translation = agentic_translate(source_text, source_lang, target_lang)
+        return jsonify({"translation": translation})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True) #自动使用电脑IP
     #app.run(debug=True) #使用172.0.0.01

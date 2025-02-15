@@ -230,38 +230,52 @@ textarea {
     width: 100%;
     height: 100px;
     padding: 10px;
-    border: 1px linen #ddd;
+    border: 1px dashed  #ddd;
     border-radius: 5px;
-    resize: vertical;
+    resize: none;          /* 禁止拖拽调整大小 */
     font-size: 24px;
     font-family: inherit;
+
+    /* 强制显示为块级元素 */
+    display: block;
+    overflow: auto;        /* 添加滚动条防止内容溢出 */
+
 }
 
-#translated-text {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px dashed #ddd;
-    border-radius: 5px;
-    resize: vertical;
-    color: #888;
-    background-color: #f9f9f9;
-}
-
-#translated-text {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px dashed #ddd;
-    border-radius: 5px;
-    resize: vertical;
-    color: #888;
-    background-color: #f9f9f9;
-}
-
-/* 确保只读文本框不能获得焦点 */
-#translated-text:focus {
+textarea:focus {
     outline: none;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    border-color: #ddd;
+}
+
+#translated-text {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    
+    /* 禁止编辑的关键设置 */
+    user-select: text;      /* 允许选中文字 */
+    -webkit-user-select: text; /* Safari 兼容 */
+    -moz-user-select: text;    /* Firefox 兼容 */
+    
+    /* 禁用交互编辑 */
+    cursor: text;           /* 显示文本光标而非指针 */
+    resize: none;          /* 禁止拖拽调整大小 */
+    background-color: #f9f9f9;
+    color: #888;
+    
+    /* 强制显示为块级元素 */
+    display: block;
+    overflow: auto;        /* 添加滚动条防止内容溢出 */
+    
+    /* 禁用焦点轮廓 */
+    outline: none;
+    
+    /* 可选：保留文本换行格式 */
+    white-space: pre-wrap; 
 }
 
 .translate-controls {
@@ -295,6 +309,6 @@ textarea {
 }
 
 .language-selection span.selected {
-    background-color: rgb(56, 103, 255); /* 浅蓝色背景 */
+    background-color:  #007bff; /* 选中背景色 */
     color: white; /* 白色字体 */
 }

@@ -1,5 +1,5 @@
 from celery import Celery
-from file_translator import FileTranslator
+from translator import Translator
 import logging
 import os
 from redis import Redis
@@ -23,7 +23,7 @@ def translate_file(self, file_path, output_path, source_lang, target_lang):
     文件翻译任务
     """
     logging.info(f"Starting translation for file: {file_path}")
-    file_translator = FileTranslator()
+    file_translator = Translator()
     try:
         logging.info(f"Initializing translation for file: {file_path}")
         file_translator.translate_file(file_path, output_path, source_lang, target_lang, self)
