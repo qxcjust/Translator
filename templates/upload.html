@@ -344,10 +344,10 @@
             });
         });
 
-        // 下载翻译后的文件
         function downloadTranslatedFile(filePath) {
             const xhr = new XMLHttpRequest();
-            xhr.open('GET', `/download?file_path=${filePath}`, true);
+            // 使用 encodeURIComponent 对 filePath 进行编码
+            xhr.open('GET', `/download?file_path=${encodeURIComponent(filePath)}`, true);
             xhr.responseType = 'blob';
             xhr.onload = function() {
                 if (xhr.status === 200) {
@@ -355,7 +355,7 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = filePath.split('/').pop();
+                    a.download = filePath.split(/[\\/]/).pop(); // 考虑到 Windows 路径分隔符
                     a.click();
                 } else {
                     console.error('Error:', xhr.statusText);
@@ -363,6 +363,7 @@
             };
             xhr.send();
         }
+
 
         // 轮询翻译进度
         function pollTranslationProgress(taskId) {
@@ -382,6 +383,7 @@
                         document.getElementById(`download-btn-${taskId}`).style.display = 'block';
                         // 更新Click函数，
                         document.getElementById(`download-btn-${taskId}`).onclick = function() {
+                            console.log(data.translated_file_path);
                             downloadTranslatedFile(data.translated_file_path);
                         };
                         clearInterval(intervalId); // 使用正确的定时器ID停止轮询
