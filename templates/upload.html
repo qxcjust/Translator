@@ -144,6 +144,8 @@
                     sourceLanguageSelections.forEach(s => s.classList.remove('selected'));
                     // 添加选中状态到当前点击的 span
                     this.classList.add('selected');
+                    // 添加翻译调用
+                    translateText();
                 });
             });
 
@@ -153,6 +155,8 @@
                     targetLanguageSelections.forEach(s => s.classList.remove('selected'));
                     // 添加选中状态到当前点击的 span
                     this.classList.add('selected');
+                    // 添加翻译调用
+                    translateText();
                 });
             });
 
