@@ -1,28 +1,33 @@
-# 配置文件，用于管理整个工程的默认配置
+# Configuration file for managing default configurations of the entire project
 import logging
 
-# 日志配置
+#version information based on tag information
+#DONOT CHANGE by manual modification
+#mktag.sh will update this file
+VERSION = "v1.0.3"
+
+# Logging configuration for the entire project
 LOG_LEVEL = logging.INFO
 
-# 模型配置
+# Model configuration
 MODEL_NAME = "qwen2.5:14b"
 ENDPOINT_URL = "http://192.168.146.137:11434/v1"
 TEMPERATURE = 0.3
 API_KEY = "my-api-key"
 
-# Redis 配置
+# Redis configuration
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = None
 
-# 其他配置
+# Other configurations
 MAX_RETRY = 3
 
-# 是否使用反思和改进功能
+# Whether to use reflection and improvement functionality
 USE_REFLECTION = False
 
-# MIME类型到缩写形式的映射
+# Mapping of MIME types to abbreviation forms
 MIME_TO_EXTENSION = {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
     'application/vnd.ms-powerpoint': 'PPT',
