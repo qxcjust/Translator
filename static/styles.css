@@ -312,3 +312,13 @@ textarea:focus {
     background-color:  #007bff; /* Selected background color */
     color: white; /* Selected text color */
 }
+
+#version-info {
+    position: absolute;
+    right: 0;
+    top: 20px; 
+    margin-right: 18px;
+    font-weight: bold;
+    font-size: 20px;
+    color: #555;
+}
