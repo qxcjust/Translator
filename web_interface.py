@@ -7,7 +7,7 @@ import logging
 import time
 from file_parsers import get_file_pages, get_file_size
 from celery.result import AsyncResult
-from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT, MIME_TO_EXTENSION,LOG_LEVEL
+from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT, MIME_TO_EXTENSION, LOG_LEVEL, VERSION
 
 # 配置日志记录
 logging.basicConfig(level=LOG_LEVEL)
@@ -194,7 +194,10 @@ def download():
     # 发送文件
     return send_from_directory(os.path.dirname(file_path), file_name, as_attachment=True)
 
-    
+@app.route('/get_version', methods=['GET'])
+def get_version():
+    return jsonify({'version': VERSION})
+
 # text文字翻译接口
 @app.route('/translate_text', methods=['POST'])
 def translate_text():

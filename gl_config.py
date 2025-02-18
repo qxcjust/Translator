@@ -4,7 +4,7 @@ import logging
 #version information based on tag information
 #DONOT CHANGE by manual modification
 #mktag.sh will update this file
-VERSION = "v1.0.3"
+VERSION = 'v1.0.3'
 
 # Logging configuration for the entire project
 LOG_LEVEL = logging.INFO

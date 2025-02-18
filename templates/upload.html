@@ -9,7 +9,7 @@
 <body>
     <h1 class="page-title active" id="textTranslate">文字翻译</h1>  
     <h1 class="page-title inactive" id="docTranslate">文档翻译</h1>
-    <div id="version-info">v1.0.3</div>
+    <div id="version-info"></div>
     <div class="container" id="textTranslateContainer" style="display: flex;">
         <div class="container" id="textTranslateContainer_Info">
             <div class="input-section">
@@ -159,12 +159,11 @@
             }
         });
 
-        // 添加JavaScript代码以获取版本信息
         document.addEventListener('DOMContentLoaded', function() {
             fetch('/get_version')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('version-info').textContent = '版本: ' + data.version;
+                    document.getElementById('version-info').textContent =  data.version;
                 })
                 .catch(error => {
                     console.error('Error fetching version info:', error);
@@ -355,7 +354,7 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = filePath.split(/[\\/]/).pop(); // 考虑到 Windows 路径分隔符
+                    a.download = filePath.split(/[\\/]/).pop();
                     a.click();
                 } else {
                     console.error('Error:', xhr.statusText);
