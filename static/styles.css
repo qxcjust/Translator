@@ -1,8 +1,7 @@
 body {
-    font-family: '微软雅黑', sans-serif; /* 添加全局字体设置 */
+    font-family: '微软雅黑', sans-serif; /* Add global font setting */
 }
 
-/* 添加 .page-title 类的样式 */
 .page-title {
     font-size: 20px;
     color: #374567;
@@ -11,46 +10,45 @@ body {
     cursor: pointer;
     padding: 10px;
     border-radius: 5px;
+    display: inline-block;
 }
-
 .page-title.active {
-    background-color: #007bff; /* 选中背景色 */
-    color: white; /* 选中文字颜色 */
+    background-color: #007bff; /* Selected background color */
+    color: white; /* Selected text color */
 }
-
 .page-title.inactive {
-    background-color: #f8f9fa; /* 非选中背景色 */
-    color: #333; /* 非选中文字颜色 */
+    background-color: #f8f9fa; /* Unselected background color */
+    color: #333; /* Unselected text color */
 }
 
 .upload-section {
     display: flex;
-    flex-direction: column; /* 修改为竖直布局 */
+    flex-direction: column; /* Change to vertical layout */
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-    gap: 20px; /* 增加图标之间的间隔 */
-    border: 2px dashed #ddd; /* 添加虚线边框 */
+    gap: 20px; /* Increase spacing between icons */
+    border: 2px dashed #ddd; /* Add dashed border */
     padding: 20px;
     border-radius: 5px;
 }
 
 .upload-section img {
-    margin-right: 30px; /* 修改为向右间隔 */
+    margin-right: 30px; /* Change to right spacing */
     height: 50px;
 }
 
 .supported-formats,
 #fileInput,
 #selectFileBtn {
-    margin: 10px 0; /* 增加上下间隔 */
+    margin: 10px 0; /* Increase vertical spacing */
 }
 
 #selectFileBtn {
     width: 220px;
     height: 41px;
-    background-color: rgb(56, 103, 255); /* 浅蓝色背景 */
-    color: white; /* 白色字体 */
+    background-color: rgb(56, 103, 255); /* Light blue background */
+    color: white; /* White text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -66,7 +64,7 @@ body {
     width: 150px;
     height: 30px;
     margin-right: 10px;
-    margin-left: 10px; /* 添加左侧间隔 */
+    margin-left: 10px; /* Add left spacing */
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 1px 10px;
@@ -82,7 +80,7 @@ body {
     background-size: 10px 10px;
 }
 
-/* 添加 file-info-section 的样式 */
+/* Add file-info-section style */
 .file-info-section {
     margin-top: 20px;
     padding: 20px;
@@ -91,14 +89,14 @@ body {
     background-color: #f9f9f9;
 }
 
-/* 添加 file-details 的样式 */
+/* Add file-details style */
 .file-details {
     margin-bottom: 15px;
     border: 2px dashed #ddd;
     padding: 10px;
     border-radius: 5px;
-    width: 50%; /* 修改宽度为50% */
-    height: 100%; /* 确保高度可拉伸 */
+    width: 50%; /* Change width to 50% */
+    height: 100%; /* Ensure height is stretchable */
 }
 
 .file-details table {
@@ -106,22 +104,22 @@ body {
     border-collapse: collapse;
 }
 
-/* table的第一行tr的样式 */
+/* Style for the first row of the table */
 .file-details table tr:first-child {
     border-bottom: 1px dashed #ddd;
-    font-weight: bold; /* 加粗显示 */
+    font-weight: bold; /* Bold display */
 }
 
 .file-details table td {
     padding: 5px;
     font-size: 14px;
-    /* 文字居中显示 */
+    /* Center text display */
     text-align: center;
     color: #333;
     vertical-align: top;
 }
 
-/* 添加 translation-controls 的样式 */
+/* Add translation-controls style */
 .translation-controls {
     display: flex;
     justify-content: space-between;
@@ -129,15 +127,15 @@ body {
     border: 2px dashed #ddd;
     padding: 20px;
     border-radius: 5px;
-    width: 40%; /* 修改宽度为40% */
-    height: 100%; /* 确保高度可拉伸 */
+    width: 40%; /* Change width to 40% */
+    height: 100%; /* Ensure height is stretchable */
 }
 
 #start-translation-btn {
     width: 150px;
     height: 40px;
-    background-color: rgb(56, 103, 255); /* 浅蓝色背景 */
-    color: white; /* 白色字体 */
+    background-color: rgb(56, 103, 255); /* Light blue background */
+    color: white; /* White text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -147,8 +145,8 @@ body {
 .info-container {
     display: flex;
     justify-content: space-between;
-    align-items: stretch; /* 修改为 stretch 以保持高度一致 */
-    height: 100%; /* 确保高度可拉伸 */
+    align-items: stretch; /* Change to stretch to keep height consistent */
+    height: 100%; /* Ensure height is stretchable */
 }
 
 .translation-status-section {
@@ -172,7 +170,7 @@ body {
 .translation-status-section th, .translation-status-section td {
     padding: 10px;
     text-align: center;
-    vertical-align: center; /* 垂直居中 */
+    vertical-align: center; /* Vertically center */
     border-bottom: 1px solid #ddd;
 }
 
@@ -181,48 +179,48 @@ body {
 }
 
 #textTranslateContainer {
-    /* 保持原有基本样式 */
+    /* Keep original basic style */
     margin-top: 20px;
     padding: 20px;
     border: 2px dashed #ddd;
     border-radius: 5px;
     position: relative;
     
-    /* 修改布局属性 */
-    display: flex; /* 强制使用flex布局 */
-    justify-content: flex-start; /* 左侧对齐 */
+    /* Change layout properties */
+    display: flex; /* Force flex layout */
+    justify-content: flex-start; /* Align left */
 }
 
 #textTranslateContainer_Info {
-    /* 保持原有基本样式 */
+    /* Keep original basic style */
     /* margin-top: 15px;
     padding: 15px; */
     /* border: 2px dashed #ddd;
     border-radius: 5px;  */
     width: 80%;
     
-    /* 修改布局属性 */
-    position: static; /* 移除相对定位 */
-    margin-left: auto; /* 通过自动边距实现居中 */
+    /* Change layout properties */
+    position: static; /* Remove relative positioning */
+    margin-left: auto; /* Use auto margin to center */
     margin-right: auto;
-    display: flex; /* 强制flex布局 */
+    display: flex; /* Force flex layout */
 }
 
 .input-section, .output-section {
     margin: 20px;
     width: 50%;
-    text-align: center; /* 使内容居中 */
+    text-align: center; /* Center content */
 }
 
-/* input-section 在 textTranslateContainer 容器内靠左对齐 */
+/* input-section aligns to the left inside textTranslateContainer */
 .input-section {
-    margin-left: 0; /* 移除左边距 */
+    margin-left: 0; /* Remove left margin */
     margin-bottom: 0;
 }
 
-/* output-section 在 textTranslateContainer 容器内靠右对齐 */
+/* output-section aligns to the right inside textTranslateContainer */
 .output-section {
-    margin-right: 20px; /* 移除右边距 */
+    margin-right: 20px; /* Remove right margin */
     margin-bottom: 0;
 }
 
@@ -232,13 +230,13 @@ textarea {
     padding: 10px;
     border: 1px dashed  #ddd;
     border-radius: 5px;
-    resize: none;          /* 禁止拖拽调整大小 */
+    resize: none;          /* Disable resizing */
     font-size: 24px;
     font-family: inherit;
 
-    /* 强制显示为块级元素 */
+    /* Force block display */
     display: block;
-    overflow: auto;        /* 添加滚动条防止内容溢出 */
+    overflow: auto;        /* Add scrollbar to prevent overflow */
 
 }
 
@@ -256,40 +254,40 @@ textarea:focus {
     border: 1px dashed #ddd;
     border-radius: 5px;
     
-    /* 禁止编辑的关键设置 */
-    user-select: text;      /* 允许选中文字 */
-    -webkit-user-select: text; /* Safari 兼容 */
-    -moz-user-select: text;    /* Firefox 兼容 */
+    /* Disable editing settings */
+    user-select: text;      /* Allow text selection */
+    -webkit-user-select: text; /* Safari compatibility */
+    -moz-user-select: text;    /* Firefox compatibility */
     
-    /* 禁用交互编辑 */
-    cursor: text;           /* 显示文本光标而非指针 */
-    resize: none;          /* 禁止拖拽调整大小 */
+    /* Disable interactive editing */
+    cursor: text;           /* Show text cursor instead of pointer */
+    resize: none;          /* Disable resizing */
     background-color: #f9f9f9;
     color: #888;
     
-    /* 强制显示为块级元素 */
+    /* Force block display */
     display: block;
-    overflow: auto;        /* 添加滚动条防止内容溢出 */
+    overflow: auto;        /* Add scrollbar to prevent overflow */
     
-    /* 禁用焦点轮廓 */
+    /* Disable focus outline */
     outline: none;
     
-    /* 可选：保留文本换行格式 */
+    /* Optional: Preserve text line breaks */
     white-space: pre-wrap; 
 
-    text-align: left; /* 使内容居中 */
+    text-align: left; /* Center content */
 }
 
 .translate-controls {
     text-align: center;
-    margin: 10px 0; /* 调整按钮的上下间距 */
+    margin: 10px 0; /* Adjust button vertical spacing */
 }
 
 #translate-button {
     width: 150px;
     height: 40px;
-    background-color: rgb(56, 103, 255); /* 浅蓝色背景 */
-    color: white; /* 白色字体 */
+    background-color: rgb(56, 103, 255); /* Light blue background */
+    color: white; /* White text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -311,6 +309,6 @@ textarea:focus {
 }
 
 .language-selection span.selected {
-    background-color:  #007bff; /* 选中背景色 */
-    color: white; /* 白色字体 */
+    background-color:  #007bff; /* Selected background color */
+    color: white; /* Selected text color */
 }

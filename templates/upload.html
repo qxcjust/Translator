@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能翻译</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        .page-title {
-            display: inline-block;
-            margin-right: 20px; /* 添加右边距以分隔两个标题 */
-            cursor: pointer; /* 添加鼠标指针样式 */
-            padding: 10px; /* 添加内边距 */
-            border-radius: 5px; /* 添加圆角 */
-        }
-        .page-title.active {
-            background-color: #007bff; /* 选中背景色 */
-            color: white; /* 选中文字颜色 */
-        }
-        .page-title.inactive {
-            background-color: #f8f9fa; /* 非选中背景色 */
-            color: #333; /* 非选中文字颜色 */
-        }
-    </style>
 </head>
 <body>
     <h1 class="page-title active" id="textTranslate">文字翻译</h1>  
