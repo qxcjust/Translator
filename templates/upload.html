@@ -444,7 +444,9 @@
             console.log('Source Language:', sourceLanguage);
             console.log('Target Language:', targetLanguage);
 
+            // 如果源语言和目标语言相同，直接复制内容到翻译结果框
             if (sourceLanguage === targetLanguage) {
+                translatedText.textContent = textToTranslate;
                 return;
             } 
 
