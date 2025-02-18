@@ -7,9 +7,11 @@ import traceback
 from pptx.util import Inches
 import re
 import math
+from gl_config import LOG_LEVEL
+
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
 
 class pptTextFormat:
     """存储文本格式信息"""

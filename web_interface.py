@@ -7,10 +7,10 @@ import logging
 import time
 from file_parsers import get_file_pages, get_file_size
 from celery.result import AsyncResult
-from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT, MIME_TO_EXTENSION
+from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT, MIME_TO_EXTENSION,LOG_LEVEL
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
 
 app = Flask(__name__)
 

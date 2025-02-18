@@ -1,9 +1,10 @@
 import argparse
 import logging
 from translator import Translator
+from gl_config import LOG_LEVEL
 
 # 配置日志记录
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=LOG_LEVEL)
 
 def main():
     parser = argparse.ArgumentParser(description="Translate files using the Translator class.")

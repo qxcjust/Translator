@@ -3,9 +3,10 @@ from pptx import Presentation
 from docx import Document  # 现在会指向正确的 python-docx 包
 import os
 import logging
+from gl_config import LOG_LEVEL
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
 # 新增函数：获取文件页数
 def get_file_pages(file_path):
     #自动识别file_type

@@ -5,9 +5,10 @@ import os
 from redis import Redis
 from redis.exceptions import ConnectionError
 from gl_config import REDIS_DB, REDIS_HOST, REDIS_PORT
+from gl_config import LOG_LEVEL
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
 
 app = Celery('task_manager', 
              broker=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',

@@ -3,8 +3,10 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Fill, Border, Alignment
 from openpyxl.drawing.image import Image
+from gl_config import LOG_LEVEL
 
-logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=LOG_LEVEL)
 
 def translate_excel(translation_core, file_path, output_path, source_lang, target_lang, task):
     """翻译Excel文件并保持原始格式和结构"""

@@ -3,9 +3,9 @@ from translation_core import TranslationCore
 from ppt_translator import translate_powerpoint
 from excel_translator import translate_excel
 from word_translator import translate_word
-# from file_pdf_translator import translate_pdf
+from gl_config import LOG_LEVEL
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=LOG_LEVEL)
 
 class Translator:
     def __init__(self):
