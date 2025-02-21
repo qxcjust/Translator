@@ -413,11 +413,17 @@
             textarea.style.height = textarea.scrollHeight + 'px'; // Set height to scrollHeight
         }
 
+        function adjustDivHeight(div) {
+            div.style.height = 'auto'; // Reset height to auto
+            div.style.height = div.scrollHeight + 'px'; // Set height to scrollHeight
+        }
+
         textInput.addEventListener('input', function() {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(() => {
                 translateText();
                 adjustTextareaHeight(textInput); // Adjust height after input
+                adjustDivHeight(translatedText); // Adjust height after input
             }, 1000);
         });
 
@@ -434,7 +440,7 @@
         });
 
         translatedText.addEventListener('change', function() {
-            adjustTextareaHeight(translatedText); // Adjust height after change
+            adjustDivHeight(translatedText); // Adjust height after change
         });
 
         function translateText() {
@@ -456,6 +462,7 @@
             // 如果源语言和目标语言相同，直接复制内容到翻译结果框
             if (sourceLanguage === targetLanguage) {
                 translatedText.textContent = textToTranslate;
+                adjustDivHeight(translatedText); // Adjust height after setting text
                 return;
             } 
 
@@ -481,6 +488,7 @@
             })
             .catch(error => {
                 translatedText.textContent = '翻译失败，请重试';
+                adjustDivHeight(translatedText); // Adjust height after setting text
                 console.error('Error:', error);
             });
         }
@@ -494,6 +502,7 @@
                     if (data.state === 'SUCCESS') {
                         clearInterval(intervalId);  // Stop polling
                         document.getElementById('translated-text').textContent = data.result;  // Set the translated text
+                        adjustDivHeight(translatedText); // Adjust height after setting text
                         console.log('Translation successful:', data.result);
                     } else if (data.state === 'FAILURE') {
                         clearInterval(intervalId);  // Stop polling
@@ -504,7 +513,7 @@
                     console.error('Error:', error);
                     clearInterval(intervalId);  // Stop polling
                 });
-            }, 3000);  // Poll every 3 seconds
+            }, 1000);  // Poll every 3 seconds
         }
 
     </script>
