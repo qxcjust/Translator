@@ -403,16 +403,21 @@
         }
 
 
-
         const textInput = document.getElementById('text-input');
         const translatedText = document.getElementById('translated-text');
 
         let debounceTimeout;
 
+        function adjustTextareaHeight(textarea) {
+            textarea.style.height = 'auto'; // Reset height to auto
+            textarea.style.height = textarea.scrollHeight + 'px'; // Set height to scrollHeight
+        }
+
         textInput.addEventListener('input', function() {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(() => {
-               translateText();
+                translateText();
+                adjustTextareaHeight(textInput); // Adjust height after input
             }, 1000);
         });
 
@@ -420,7 +425,16 @@
             if (event.key === 'Enter') {
                 clearTimeout(debounceTimeout);
                 translateText();
+                adjustTextareaHeight(textInput); // Adjust height after Enter key press
             }
+        });
+
+        translatedText.addEventListener('input', function() {
+            adjustTextareaHeight(translatedText); // Adjust height after input
+        });
+
+        translatedText.addEventListener('change', function() {
+            adjustTextareaHeight(translatedText); // Adjust height after change
         });
 
         function translateText() {
