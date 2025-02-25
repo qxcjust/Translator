@@ -18,7 +18,7 @@
                     <span data-value="Japanese" class="selected">日文</span>
                     <span data-value="English">英文</span>
                 </div>
-                <textarea id="text-input" placeholder=""></textarea>
+                <textarea id="text-input" placeholder="" class="font-japanese"></textarea>
             </div>
             <div class="output-section">
                 <div class="language-selection" id="target_language_selection">
@@ -26,7 +26,7 @@
                     <span data-value="Japanese">日文</span>
                     <span data-value="English">英文</span>
                 </div>
-                <div id="translated-text" readonly></div>
+                <div id="translated-text" readonly class="font-chinese"></div>
             </div>
         </div>
     </div>
@@ -116,6 +116,56 @@
         </div>
     </div>
     <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // 从 localStorage 中读取存储的语言选择
+            const storedSourceLang = localStorage.getItem('sourceLanguage');
+            const storedTargetLang = localStorage.getItem('targetLanguage');
+
+            // 如果存储了源语言，则设置为选中状态
+            if (storedSourceLang) {
+                const sourceSpans = document.querySelectorAll('#source_language_selection span');
+                sourceSpans.forEach(span => {
+                    if (span.dataset.value === storedSourceLang) {
+                        span.classList.add('selected');
+                    } else {
+                        span.classList.remove('selected');
+                    }
+                });
+            }
+
+            // 如果存储了目标语言，则设置为选中状态
+            if (storedTargetLang) {
+                const targetSpans = document.querySelectorAll('#target_language_selection span');
+                targetSpans.forEach(span => {
+                    if (span.dataset.value === storedTargetLang) {
+                        span.classList.add('selected');
+                    } else {
+                        span.classList.remove('selected');
+                    }
+                });
+            }
+
+            // 监听源语言选择
+            const sourceLanguageSelections = document.querySelectorAll('#source_language_selection span');
+            sourceLanguageSelections.forEach(span => {
+                span.addEventListener('click', function () {
+                    const selectedSourceLang = this.dataset.value;
+                    localStorage.setItem('sourceLanguage', selectedSourceLang); // 存储到 localStorage
+                });
+            });
+
+            // 监听目标语言选择
+            const targetLanguageSelections = document.querySelectorAll('#target_language_selection span');
+            targetLanguageSelections.forEach(span => {
+                span.addEventListener('click', function () {
+                    const selectedTargetLang = this.dataset.value;
+                    localStorage.setItem('targetLanguage', selectedTargetLang); // 存储到 localStorage
+                });
+            });
+        });
+
+
 
         document.addEventListener('DOMContentLoaded', function() {
             const sourceLanguageSelections = document.querySelectorAll('#source_language_selection span');
@@ -458,6 +508,28 @@
 
             console.log('Source Language:', sourceLanguage);
             console.log('Target Language:', targetLanguage);
+
+            // 移除所有字体类
+            textInput.classList.remove('font-chinese', 'font-japanese', 'font-english');
+            translatedText.classList.remove('font-chinese', 'font-japanese', 'font-english');
+
+            // 根据源语言设置字体
+            if (sourceLanguage === 'Chinese') {
+                textInput.classList.add('font-chinese');
+            } else if (sourceLanguage === 'Japanese') {
+                textInput.classList.add('font-japanese');
+            } else if (sourceLanguage === 'English') {
+                textInput.classList.add('font-english');
+            }
+
+            // 根据目标语言设置字体
+            if (targetLanguage === 'Chinese') {
+                translatedText.classList.add('font-chinese');
+            } else if (targetLanguage === 'Japanese') {
+                translatedText.classList.add('font-japanese');
+            } else if (targetLanguage === 'English') {
+                translatedText.classList.add('font-english');
+            }
 
             // 如果源语言和目标语言相同，直接复制内容到翻译结果框
             if (sourceLanguage === targetLanguage) {
