@@ -48,6 +48,8 @@ class TranslationCore:
         # 前置检查流程
         check_result = self._pre_translation_checks(original_text, target_lang)
         if check_result is not None:
+            #翻译前后内容记录到logfiles下translation_feedback.csv文件中
+            self._log_translation_feedback(original_text, check_result)
             return check_result
 
 
@@ -61,8 +63,17 @@ class TranslationCore:
             finally_result = initial_result
 
         logging.info(f"{original_text} → {initial_result} → {finally_result} Translating from {source_lang} to {target_lang}")
+        self._log_translation_feedback(original_text, check_result)
         return finally_result
 
+
+    def _log_translation_feedback(self, original_text, translated_text):
+        """记录翻译前后的内容到logfiles下translation_feedback.csv文件中"""
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        with open('logfiles/translation_feedback.csv', 'a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow([current_time, original_text, translated_text])
+    
     def _pre_translation_checks(self, text, target_lang):
         """执行所有前置检查的集成方法"""
         # 空值检查

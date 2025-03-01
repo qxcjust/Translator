@@ -249,6 +249,19 @@ def translation_text(task_id):
         }
     return jsonify(response)    
 
+@app.route('/feedback', methods=['GET'])
+def show_feedback():
+    import pandas as pd
+    try:
+        # 读取logfiles目录下的translation_feedback.csv文件
+        feedback_df = pd.read_csv('logfiles/translation_feedback.csv')
+        # 将DataFrame转换为HTML表格
+        feedback_html = feedback_df.to_html(index=False)
+        return render_template('feedback.html', feedback_table=feedback_html)
+    except Exception as e:
+        logging.error(f"Error reading feedback file: {e}")
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True) #自动使用电脑IP
     #app.run(debug=True) #使用172.0.0.01
