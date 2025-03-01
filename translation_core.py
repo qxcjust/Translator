@@ -21,7 +21,8 @@ class AcronymManager:
     def __init__(self):
         # 定义汽车行业常见缩写和允许的字符
         self.industry_abbreviations = {'ECU', 'ABS', 'ESP', 'CAN', 'LIN', 'OTA'}
-        self.alphanumeric_chars = r'a-zA-Z0-9'  # 大小写字母和数字
+        # 在AcronymManager中修改字符定义
+        self.alphanumeric_chars = r'A-Z0-9'  # 仅大写字母和数字
         # 压缩后的正则表达式模式（带注释）
         self.special_characters = r'\s\.,„;:!?\(\)\[\]{}<>\-–—‒=+\±/\\|@#%^&*~$€£¥Ψ¢"“”\'‘’`«»‹›…¤‚•·∙'
 
@@ -78,9 +79,9 @@ class TranslationCore:
             logging.info(f"目标语言内容保留: {text}")
             return text
             
-        # # 单字符/无效输入检查
-        # if not self._is_translatable(text):
-        #     return text
+        # 单字符/无效输入检查
+        if not self._is_translatable(text):
+            return text
             
         return None
 
@@ -133,14 +134,19 @@ class TranslationCore:
 
     def _is_technical_content(self, text):
         """检测是否是纯技术内容（缩写/符号）"""
-        # 匹配行业缩写
-        if text.strip().upper() in self.acronym_manager.industry_abbreviations:
+        stripped_text = text.strip()
+        
+        # 匹配行业缩写（全大写或标准缩写形式）
+        if stripped_text.upper() in self.acronym_manager.industry_abbreviations:
             return True
+        
+        # 新增强条件：如果包含小写字母则直接返回False
+        if any(c.islower() for c in stripped_text):
+            return False
             
-        # 匹配技术格式（大写字母、数字、符号）
+        # 匹配技术格式（仅允许大写字母、数字、技术符号）
         pattern = rf'^[{self.acronym_manager.alphanumeric_chars}{self.acronym_manager.special_characters}]*$'
-        return re.match(pattern, text, re.ASCII) is not None
-
+        return re.match(pattern, stripped_text, re.ASCII) is not None
 
     def initial_translation_with_lang(self, processed_text, source_lang, target_lang):
         """初步翻译方法"""

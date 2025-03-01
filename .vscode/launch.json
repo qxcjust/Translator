@@ -2,21 +2,26 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    // (venv) PS Q:\Translator> python.exe .\cl_cline.py .\Updatefile\2025-02-05\技术空间demo_20250121.pptx .\translateFiles\2025-02-05\技术空间demo_20250121_English.pptx Chinese English
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": "Python: 翻译器",
+            "name": "Python: file translator",
             "type": "debugpy",
             "request": "launch",
-            "program": "cl_interface.py",
+            "program": "cl_file_interface.py",
             "args": [
                 ".\\Updatefile\\2025-02-28\\USB_TPS2585x-Q1.docx",
                 ".\\translateFiles\\2025-02-28\\USB_TPS2585x-Q1.Chinese.docx",
                 "English",                
                 "Chinese"
             ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: text translator",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "cl_text_interface.py",
             "console": "integratedTerminal"
         }
     ]
