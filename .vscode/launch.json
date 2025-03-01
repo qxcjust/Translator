@@ -12,10 +12,10 @@
             "request": "launch",
             "program": "cl_interface.py",
             "args": [
-                ".\\Updatefile\\2025-02-14\\技术空间demo_20250121.pptx",
-                ".\\translateFiles\\2025-02-14\\技术空间demo_20250121_Japanese.pptx",
-                "Chinese",                
-                "Japanese"
+                ".\\Updatefile\\2025-02-28\\USB_TPS2585x-Q1.docx",
+                ".\\translateFiles\\2025-02-28\\USB_TPS2585x-Q1.Chinese.docx",
+                "English",                
+                "Chinese"
             ],
             "console": "integratedTerminal"
         }
