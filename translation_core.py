@@ -78,9 +78,9 @@ class TranslationCore:
             logging.info(f"目标语言内容保留: {text}")
             return text
             
-        # 单字符/无效输入检查
-        if not self._is_translatable(text):
-            return self._get_context_required_message(target_lang)
+        # # 单字符/无效输入检查
+        # if not self._is_translatable(text):
+        #     return text
             
         return None
 
