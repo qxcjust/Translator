@@ -8,7 +8,7 @@ from pptx.dml.color import RGBColor
 def update_progress(task, current_work, total_work):
     """更新翻译进度"""
     if task is not None:
-        progress = (current_work / total_work) * 100
+        progress = (current_work / total_work) * 100 if total_work > 0 else 0
         task.update_state(
             state='PROGRESS',
             meta={
@@ -82,6 +82,19 @@ def calculate_total_work(doc):
         for row in table.rows:
             for cell in row.cells:
                 total_work += len(cell.text)
+                # 检查单元格是否包含嵌套表格
+                if cell.tables:
+                    for nested_table in cell.tables:
+                        for nested_row in nested_table.rows:
+                            for nested_cell in nested_row.cells:
+                                total_work += len(nested_cell.text)
+
+    # 处理内联形状的文本
+    for shape in doc.inline_shapes:
+        if hasattr(shape, 'text_frame'):
+            text_frame = shape.text_frame
+            for para in text_frame.paragraphs:
+                total_work += len(para.text)
 
     # 处理页眉和页脚
     for section in doc.sections:
@@ -93,6 +106,12 @@ def calculate_total_work(doc):
             for row in table.rows:
                 for cell in row.cells:
                     total_work += len(cell.text)
+                    # 检查单元格是否包含嵌套表格
+                    if cell.tables:
+                        for nested_table in cell.tables:
+                            for nested_row in nested_table.rows:
+                                for nested_cell in nested_row.cells:
+                                    total_work += len(nested_cell.text)
         # 页脚
         footer = section.footer
         for para in footer.paragraphs:
@@ -101,6 +120,12 @@ def calculate_total_work(doc):
             for row in table.rows:
                 for cell in row.cells:
                     total_work += len(cell.text)
+                    # 检查单元格是否包含嵌套表格
+                    if cell.tables:
+                        for nested_table in cell.tables:
+                            for nested_row in nested_table.rows:
+                                for nested_cell in nested_row.cells:
+                                    total_work += len(nested_cell.text)
     return total_work
 
 def translate_word(translation_core, file_path, output_path, source_lang, target_lang, task):
