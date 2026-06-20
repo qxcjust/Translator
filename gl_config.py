@@ -10,10 +10,10 @@ VERSION = 'v1.0.5'
 LOG_LEVEL = logging.INFO
 
 # Model configuration
-MODEL_NAME = "qwen2.5:14b"
-ENDPOINT_URL = "http://192.168.146.137:11434/v1"
+MODEL_NAME = "translatgemma:4b"
+ENDPOINT_URL = "http://127.0.0.1:11434/v1"
 TEMPERATURE = 0.3
-API_KEY = "my-api-key"
+API_KEY = None
 
 # Redis configuration
 REDIS_HOST = 'localhost'

@@ -39,6 +39,8 @@
    pip install -r requirements.txt
    ```
 
+> 默认配置使用本地 Ollama 模型 `translatgemma:4b`，本地 API 地址配置为 `http://127.0.0.1:11434/v1`。
+
 ## 使用方法
 1. 启动服务：redis-server
 2. 启动服务：celery -A task_manager  worker --loglevel=info --pool=solo
