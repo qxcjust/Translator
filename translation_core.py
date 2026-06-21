@@ -30,7 +30,10 @@ class AcronymManager:
 class TranslationCore:
     def __init__(self, model_name=MODEL_NAME, endpoint_url=ENDPOINT_URL, temperature=TEMPERATURE):
         # Initialize model
-        self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key=API_KEY, temperature=temperature)
+        # Some OpenAI-compatible clients require a non-empty api_key value even for local endpoints
+        # If API_KEY is not provided, set a harmless placeholder so client initialization succeeds.
+        api_key_to_use = API_KEY if API_KEY is not None else (os.environ.get("OPENAI_API_KEY") or "ollama-local")
+        self.llm = ChatOpenAI(model=model_name, base_url=endpoint_url, api_key=api_key_to_use, temperature=temperature)
         
         self.acronym_manager = AcronymManager()
 
