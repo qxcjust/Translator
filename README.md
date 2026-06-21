@@ -51,3 +51,11 @@
 
 
 ### 通过命令行翻译文件
+
+## 已恢复架构与快速启动
+
+项目已生成一份最小可运行架构说明文档，包含已恢复的依赖、模型配置与快速启动步骤。请参阅：
+
+- 文档: [ARCHITECTURE_RESTORE.md](ARCHITECTURE_RESTORE.md)
+
+该文档记录了在 Windows 上使用最小依赖启动本项目的步骤，以及对 `gl_config.py` 中本地 Ollama 模型配置的说明。
